@@ -5,8 +5,8 @@ import "time"
 type TransactionType string
 
 const (
-	TRAN_PAYMENT_RECEIVED = "payment_received"
-	TRAN_PAYMENT_SENT     = "payment_sent"
+	TRAN_PAYMENT_RECEIVED TransactionType = "payment_received"
+	TRAN_PAYMENT_SENT     TransactionType = "payment_sent"
 )
 
 type Transaction struct {
