@@ -10,12 +10,12 @@ type UserService interface {
 	FindByCPF(cpf string) (*User, error)
 }
 
-type UserSvc struct {
+type userSvc struct {
 	userRepo *UserRepository
 	wallSvc  *WalletService
 }
 
-func (s *UserSvc) Create(role UserRole, fullname, cpf, email, password string) error {
+func (s *userSvc) Create(role UserRole, fullname, cpf, email, password string) error {
 	usrRepo := *s.userRepo
 	wallSvc := *s.wallSvc
 
@@ -68,7 +68,7 @@ func (s *UserSvc) Create(role UserRole, fullname, cpf, email, password string) e
 	return nil
 }
 
-func (s *UserSvc) FindByCPF(cpf string) (*User, error) {
+func (s *userSvc) FindByCPF(cpf string) (*User, error) {
 	usrRepo := *s.userRepo
 
 	usr, err := usrRepo.FindByCPF(cpf)
@@ -85,14 +85,14 @@ func (s *UserSvc) FindByCPF(cpf string) (*User, error) {
 	return usr, nil
 }
 
-var userSvc *UserSvc
+var userSvcRef *userSvc
 
 func NewUserService(userRepo *UserRepository, wallSvc *WalletService) UserService {
-	if userSvc == nil {
-		userSvc = &UserSvc{
+	if userSvcRef == nil {
+		userSvcRef = &userSvc{
 			userRepo,
 			wallSvc,
 		}
 	}
-	return userSvc
+	return userSvcRef
 }

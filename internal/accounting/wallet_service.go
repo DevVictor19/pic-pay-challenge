@@ -4,18 +4,18 @@ type WalletService interface {
 	Create(userID int, balance int64) error
 }
 
-type WalletSvc struct {
+type walletSvc struct {
 }
 
-func (s *WalletSvc) Create(userID int, balance int64) error {
+func (s *walletSvc) Create(userID int, balance int64) error {
 	return nil
 }
 
-var walletSvc *WalletSvc
+var walletSvcRef *walletSvc
 
 func NewWalletService(wallRepo *WalletRepository) WalletService {
-	if walletSvc == nil {
-		walletSvc = &WalletSvc{}
+	if walletSvcRef == nil {
+		walletSvcRef = &walletSvc{}
 	}
-	return walletSvc
+	return walletSvcRef
 }
