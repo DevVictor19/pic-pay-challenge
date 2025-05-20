@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/DevVictor19/pic-pay-challenge/internal/utils"
+	"github.com/DevVictor19/pic-pay-challenge/internal/infra/utils"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )

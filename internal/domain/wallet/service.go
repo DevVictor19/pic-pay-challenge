@@ -1,4 +1,4 @@
-package accounting
+package wallet
 
 type WalletService interface {
 	Create(userID int, balance int64) error

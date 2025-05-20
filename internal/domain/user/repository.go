@@ -1,4 +1,4 @@
-package accounting
+package user
 
 type UserRepository interface {
 	Save(u User) (int, error)
