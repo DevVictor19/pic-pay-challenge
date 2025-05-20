@@ -11,7 +11,7 @@ type UserService interface {
 }
 
 type UserSvc struct {
-	userRepo *userRepository
+	userRepo *UserRepository
 	wallSvc  *WalletService
 }
 
@@ -19,7 +19,7 @@ func (s *UserSvc) Create(role UserRole, fullname, cpf, email, password string) e
 	usrRepo := *s.userRepo
 	wallSvc := *s.wallSvc
 
-	withSameEmail, err := usrRepo.findByEmail(email)
+	withSameEmail, err := usrRepo.FindByEmail(email)
 	if err != nil {
 		// TODO: melhorar tratamento de erros
 		return err
@@ -30,7 +30,7 @@ func (s *UserSvc) Create(role UserRole, fullname, cpf, email, password string) e
 		return errors.New("email já cadastrado")
 	}
 
-	withSameCpf, err := usrRepo.findByCPF(cpf)
+	withSameCpf, err := usrRepo.FindByCPF(cpf)
 	if err != nil {
 		// TODO: melhorar tratamento de erros
 		return err
@@ -54,7 +54,7 @@ func (s *UserSvc) Create(role UserRole, fullname, cpf, email, password string) e
 	}
 
 	// TODO: validar dados do user antes de salvar
-	userId, err := usrRepo.save(user)
+	userId, err := usrRepo.Save(user)
 	if err != nil {
 		// TODO: melhorar tratamento de erros
 		return err
@@ -71,7 +71,7 @@ func (s *UserSvc) Create(role UserRole, fullname, cpf, email, password string) e
 func (s *UserSvc) FindByCPF(cpf string) (*User, error) {
 	usrRepo := *s.userRepo
 
-	usr, err := usrRepo.findByCPF(cpf)
+	usr, err := usrRepo.FindByCPF(cpf)
 	if err != nil {
 		// TODO: melhorar tratamento de erros
 		return nil, err
@@ -87,7 +87,7 @@ func (s *UserSvc) FindByCPF(cpf string) (*User, error) {
 
 var userSvc *UserSvc
 
-func NewUserService(userRepo *userRepository, wallSvc *WalletService) UserService {
+func NewUserService(userRepo *UserRepository, wallSvc *WalletService) UserService {
 	if userSvc == nil {
 		userSvc = &UserSvc{
 			userRepo,

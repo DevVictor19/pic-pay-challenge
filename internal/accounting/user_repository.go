@@ -1,7 +1,7 @@
 package accounting
 
-type userRepository interface {
-	save(u User) (int, error)
-	findByCPF(cpf string) (*User, error)
-	findByEmail(email string) (*User, error)
+type UserRepository interface {
+	Save(u User) (int, error)
+	FindByCPF(cpf string) (*User, error)
+	FindByEmail(email string) (*User, error)
 }

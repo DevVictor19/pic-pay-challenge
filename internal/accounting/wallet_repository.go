@@ -1,5 +1,5 @@
 package accounting
 
-type walletRepository interface {
-	save(w Wallet) error
+type WalletRepository interface {
+	Save(w Wallet) error
 }

@@ -13,7 +13,7 @@ func (s *WalletSvc) Create(userID int, balance int64) error {
 
 var walletSvc *WalletSvc
 
-func NewWalletService(wallRepo *walletRepository) WalletService {
+func NewWalletService(wallRepo *WalletRepository) WalletService {
 	if walletSvc == nil {
 		walletSvc = &WalletSvc{}
 	}
