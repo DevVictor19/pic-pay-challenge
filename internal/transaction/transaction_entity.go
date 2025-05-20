@@ -1,6 +1,8 @@
-package entities
+package transaction
 
-import "time"
+import (
+	"time"
+)
 
 type TransactionType string
 
