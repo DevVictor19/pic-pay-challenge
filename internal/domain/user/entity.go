@@ -19,6 +19,7 @@ type User struct {
 	Fullname  string    `json:"fullname"`
 	Role      UserRole  `json:"role"`
 	CPF       string    `json:"cpf"`
+	CNPJ      string    `json:"cnpj"`
 	Email     string    `json:"email"`
 	Password  string    `json:"-"`
 	UpdatedAt time.Time `json:"updated_at"`
@@ -32,7 +33,22 @@ func (u *User) Validate() error {
 	if err := isValidRole(u.Role); err != nil {
 		return err
 	}
+	if u.Role == USER_COMMON {
+		err := isValidCPF(u.CPF)
+		if err != nil {
+			return err
+		}
+	}
+	if u.Role == USER_SHOPKEEPER {
+		err := isValidCNPJ(u.CNPJ)
+		if err != nil {
+			return err
+		}
+	}
 	if err := isValidCPF(u.CPF); err != nil {
+		return err
+	}
+	if err := isValidCNPJ(u.CNPJ); err != nil {
 		return err
 	}
 	if err := isValidEmail(u.Email); err != nil {
@@ -68,6 +84,18 @@ func isValidCPF(str string) error {
 	for _, ch := range str {
 		if ch < '0' || ch > '9' {
 			return errors.New("CPF must contain only numeric digits")
+		}
+	}
+	return nil
+}
+
+func isValidCNPJ(str string) error {
+	if len(str) != 14 {
+		return errors.New("CNPJ must have exactly 14 digits")
+	}
+	for _, ch := range str {
+		if ch < '0' || ch > '9' {
+			return errors.New("CNPJ must contain only numeric digits")
 		}
 	}
 	return nil
