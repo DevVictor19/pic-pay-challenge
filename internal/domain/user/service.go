@@ -1,13 +1,17 @@
 package user
 
 import (
-	"errors"
+	"fmt"
 	"time"
+
+	"github.com/DevVictor19/pic-pay-challenge/internal/infra/http_errors"
 )
 
 type UserService interface {
 	Create(role UserRole, fullname, cpf, email, password string) (int, error)
 	FindByCPF(cpf string) (*User, error)
+	FindByEmail(email string) (*User, error)
+	FindByID(id string) (*User, error)
 }
 
 type userSvc struct {
@@ -29,9 +33,14 @@ func (s *userSvc) Create(role UserRole, fullname, cpf, email, password string) (
 		CreatedAt: now,
 	}
 
+	err := user.Validate()
+	if err != nil {
+		return 0, fmt.Errorf("invalid user data: %w", http_errors.ErrBadRequest)
+	}
+
 	userId, err := usrRepo.Save(user)
 	if err != nil {
-		return 0, err
+		return 0, fmt.Errorf("error saving user: %w", http_errors.ErrInternal)
 	}
 
 	return userId, nil
@@ -42,11 +51,41 @@ func (s *userSvc) FindByCPF(cpf string) (*User, error) {
 
 	usr, err := usrRepo.FindByCPF(cpf)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error finding user by cpf: %w", http_errors.ErrInternal)
 	}
 
 	if usr == nil {
-		return nil, errors.New("usuário não encontrado")
+		return nil, fmt.Errorf("user not found: %w", http_errors.ErrNotFound)
+	}
+
+	return usr, nil
+}
+
+func (s *userSvc) FindByEmail(email string) (*User, error) {
+	usrRepo := *s.userRepo
+
+	usr, err := usrRepo.FindByEmail(email)
+	if err != nil {
+		return nil, fmt.Errorf("error finding user by email: %w", http_errors.ErrInternal)
+	}
+
+	if usr == nil {
+		return nil, fmt.Errorf("user not found: %w", http_errors.ErrNotFound)
+	}
+
+	return usr, nil
+}
+
+func (s *userSvc) FindByID(id string) (*User, error) {
+	usrRepo := *s.userRepo
+
+	usr, err := usrRepo.FindByID(id)
+	if err != nil {
+		return nil, fmt.Errorf("error finding user by id: %w", http_errors.ErrInternal)
+	}
+
+	if usr == nil {
+		return nil, fmt.Errorf("user not found: %w", http_errors.ErrNotFound)
 	}
 
 	return usr, nil
