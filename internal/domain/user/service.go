@@ -11,6 +11,7 @@ type UserService interface {
 	CreateCommon(fullname, cpf, email, password string) (int, error)
 	CreateShopkeeper(fullname, cnpj, email, password string) (int, error)
 	FindByCPF(cpf string) (*User, error)
+	FindByCNPJ(cnpj string) (*User, error)
 	FindByEmail(email string) (*User, error)
 	FindByID(id string) (*User, error)
 }
@@ -81,6 +82,21 @@ func (s *userSvc) FindByCPF(cpf string) (*User, error) {
 	usr, err := usrRepo.FindByCPF(cpf)
 	if err != nil {
 		return nil, fmt.Errorf("error finding user by cpf: %w", http_errors.ErrInternal)
+	}
+
+	if usr == nil {
+		return nil, fmt.Errorf("user not found: %w", http_errors.ErrNotFound)
+	}
+
+	return usr, nil
+}
+
+func (s *userSvc) FindByCNPJ(cnpj string) (*User, error) {
+	usrRepo := *s.userRepo
+
+	usr, err := usrRepo.FindByCNPJ(cnpj)
+	if err != nil {
+		return nil, fmt.Errorf("error finding user by cnpj: %w", http_errors.ErrInternal)
 	}
 
 	if usr == nil {
