@@ -8,7 +8,8 @@ import (
 )
 
 type UserService interface {
-	Create(role UserRole, fullname, cpf, email, password string) (int, error)
+	CreateCommon(fullname, cpf, email, password string) (int, error)
+	CreateShopkeeper(fullname, cnpj, email, password string) (int, error)
 	FindByCPF(cpf string) (*User, error)
 	FindByEmail(email string) (*User, error)
 	FindByID(id string) (*User, error)
@@ -18,15 +19,43 @@ type userSvc struct {
 	userRepo *UserRepository
 }
 
-func (s *userSvc) Create(role UserRole, fullname, cpf, email, password string) (int, error) {
+func (s *userSvc) CreateCommon(fullname, cpf, email, password string) (int, error) {
 	usrRepo := *s.userRepo
 
 	now := time.Now()
 
 	user := User{
 		Fullname:  fullname,
-		Role:      role,
+		Role:      USER_COMMON,
 		CPF:       cpf,
+		Email:     email,
+		Password:  password,
+		UpdatedAt: now,
+		CreatedAt: now,
+	}
+
+	err := user.Validate()
+	if err != nil {
+		return 0, fmt.Errorf("invalid user data: %w", http_errors.ErrBadRequest)
+	}
+
+	userId, err := usrRepo.Save(user)
+	if err != nil {
+		return 0, fmt.Errorf("error saving user: %w", http_errors.ErrInternal)
+	}
+
+	return userId, nil
+}
+
+func (s *userSvc) CreateShopkeeper(fullname, cnpj, email, password string) (int, error) {
+	usrRepo := *s.userRepo
+
+	now := time.Now()
+
+	user := User{
+		Fullname:  fullname,
+		Role:      USER_SHOPKEEPER,
+		CNPJ:      cnpj,
 		Email:     email,
 		Password:  password,
 		UpdatedAt: now,
