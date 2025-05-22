@@ -27,8 +27,11 @@ func (s *walletSvc) Create(userID int, balance int64) error {
 		CreatedAt: now,
 	}
 
-	err := wallRepo.Save(wall)
-	if err != nil {
+	if err := wall.Validate(); err != nil {
+		return fmt.Errorf("invalid wallet data: %w", apperr.ErrBadRequest)
+	}
+
+	if err := wallRepo.Save(wall); err != nil {
 		return fmt.Errorf("error saving wallet: %w", apperr.ErrInternal)
 	}
 
