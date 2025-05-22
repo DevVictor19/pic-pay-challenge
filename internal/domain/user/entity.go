@@ -5,6 +5,7 @@ import (
 	"regexp"
 	"strings"
 	"time"
+	"unicode"
 )
 
 type UserRole string
@@ -33,23 +34,17 @@ func (u *User) Validate() error {
 	if err := isValidRole(u.Role); err != nil {
 		return err
 	}
-	if u.Role == USER_COMMON {
-		err := isValidCPF(u.CPF)
-		if err != nil {
+	switch u.Role {
+	case USER_COMMON:
+		if err := isValidCPF(u.CPF); err != nil {
 			return err
 		}
-	}
-	if u.Role == USER_SHOPKEEPER {
-		err := isValidCNPJ(u.CNPJ)
-		if err != nil {
+	case USER_SHOPKEEPER:
+		if err := isValidCNPJ(u.CNPJ); err != nil {
 			return err
 		}
-	}
-	if err := isValidCPF(u.CPF); err != nil {
-		return err
-	}
-	if err := isValidCNPJ(u.CNPJ); err != nil {
-		return err
+	default:
+		return errors.New("unsupported user role")
 	}
 	if err := isValidEmail(u.Email); err != nil {
 		return err
@@ -63,9 +58,6 @@ func (u *User) Validate() error {
 func isValidFullname(str string) error {
 	if len(strings.TrimSpace(str)) < 3 {
 		return errors.New("fullname must be at least 3 characters")
-	}
-	if !strings.Contains(str, " ") {
-		return errors.New("fullname must contain at least a space separating first and last name")
 	}
 	return nil
 }
@@ -82,7 +74,7 @@ func isValidCPF(str string) error {
 		return errors.New("CPF must have exactly 11 digits")
 	}
 	for _, ch := range str {
-		if ch < '0' || ch > '9' {
+		if !unicode.IsDigit(ch) {
 			return errors.New("CPF must contain only numeric digits")
 		}
 	}
@@ -94,7 +86,7 @@ func isValidCNPJ(str string) error {
 		return errors.New("CNPJ must have exactly 14 digits")
 	}
 	for _, ch := range str {
-		if ch < '0' || ch > '9' {
+		if !unicode.IsDigit(ch) {
 			return errors.New("CNPJ must contain only numeric digits")
 		}
 	}
@@ -102,7 +94,7 @@ func isValidCNPJ(str string) error {
 }
 
 func isValidEmail(str string) error {
-	re := regexp.MustCompile(`^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$`)
+	re := regexp.MustCompile(`^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$`)
 	if !re.MatchString(str) {
 		return errors.New("invalid email format")
 	}
