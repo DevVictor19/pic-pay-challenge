@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/DevVictor19/pic-pay-challenge/internal/infra/http_errors"
+	"github.com/DevVictor19/pic-pay-challenge/internal/infra/apperr"
 )
 
 type WalletService interface {
@@ -29,7 +29,7 @@ func (s *walletSvc) Create(userID int, balance int64) error {
 
 	err := wallRepo.Save(wall)
 	if err != nil {
-		return fmt.Errorf("error saving wallet: %w", http_errors.ErrInternal)
+		return fmt.Errorf("error saving wallet: %w", apperr.ErrInternal)
 	}
 
 	return nil

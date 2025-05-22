@@ -1,4 +1,4 @@
-package http_errors
+package apperr
 
 import "errors"
 
