@@ -1,6 +1,7 @@
 package wallet
 
 import (
+	"context"
 	"net/http"
 	"time"
 
@@ -8,14 +9,14 @@ import (
 )
 
 type WalletService interface {
-	Create(userID int, balance int64) error
+	Create(ctx context.Context, userID int, balance int64) error
 }
 
 type walletSvc struct {
 	wallRepo *WalletRepository
 }
 
-func (s *walletSvc) Create(userID int, balance int64) error {
+func (s *walletSvc) Create(ctx context.Context, userID int, balance int64) error {
 	wallRepo := *s.wallRepo
 
 	now := time.Now()
@@ -31,7 +32,7 @@ func (s *walletSvc) Create(userID int, balance int64) error {
 		return apperr.NewHttpError(http.StatusUnprocessableEntity, err.Error())
 	}
 
-	if err := wallRepo.Save(wall); err != nil {
+	if err := wallRepo.Save(ctx, wall); err != nil {
 		return err
 	}
 

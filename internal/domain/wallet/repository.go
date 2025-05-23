@@ -1,5 +1,7 @@
 package wallet
 
+import "context"
+
 type WalletRepository interface {
-	Save(w Wallet) error
+	Save(ctx context.Context, w Wallet) error
 }
