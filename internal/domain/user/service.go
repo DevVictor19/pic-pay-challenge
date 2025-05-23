@@ -1,6 +1,7 @@
 package user
 
 import (
+	"context"
 	"net/http"
 	"time"
 
@@ -8,29 +9,29 @@ import (
 )
 
 type UserService interface {
-	CreateCommon(fullname, cpf, email, password string) (int, error)
-	CreateShopkeeper(fullname, cnpj, email, password string) (int, error)
-	FindByCPF(cpf string) (*User, error)
-	FindByCNPJ(cnpj string) (*User, error)
-	FindByEmail(email string) (*User, error)
-	FindByID(id string) (*User, error)
+	CreateCommon(ctx context.Context, dto CommonUserDTO) (int, error)
+	CreateShopkeeper(ctx context.Context, dto ShopkeeperUserDTO) (int, error)
+	FindByCPF(ctx context.Context, cpf string) (*User, error)
+	FindByCNPJ(ctx context.Context, cnpj string) (*User, error)
+	FindByEmail(ctx context.Context, email string) (*User, error)
+	FindByID(ctx context.Context, id string) (*User, error)
 }
 
 type userSvc struct {
 	userRepo *UserRepository
 }
 
-func (s *userSvc) CreateCommon(fullname, cpf, email, password string) (int, error) {
+func (s *userSvc) CreateCommon(ctx context.Context, dto CommonUserDTO) (int, error) {
 	usrRepo := *s.userRepo
 
 	now := time.Now()
 
 	user := User{
-		Fullname:  fullname,
+		Fullname:  dto.Fullname,
 		Role:      Common,
-		CPF:       cpf,
-		Email:     email,
-		Password:  password,
+		CPF:       dto.CPF,
+		Email:     dto.Email,
+		Password:  dto.Password,
 		UpdatedAt: now,
 		CreatedAt: now,
 	}
@@ -40,7 +41,7 @@ func (s *userSvc) CreateCommon(fullname, cpf, email, password string) (int, erro
 		return 0, apperr.NewHttpError(http.StatusUnprocessableEntity, err.Error())
 	}
 
-	userId, err := usrRepo.Save(user)
+	userId, err := usrRepo.Save(ctx, user)
 	if err != nil {
 		return 0, err
 	}
@@ -48,17 +49,17 @@ func (s *userSvc) CreateCommon(fullname, cpf, email, password string) (int, erro
 	return userId, nil
 }
 
-func (s *userSvc) CreateShopkeeper(fullname, cnpj, email, password string) (int, error) {
+func (s *userSvc) CreateShopkeeper(ctx context.Context, dto ShopkeeperUserDTO) (int, error) {
 	usrRepo := *s.userRepo
 
 	now := time.Now()
 
 	user := User{
-		Fullname:  fullname,
+		Fullname:  dto.Fullname,
 		Role:      Shopkeeper,
-		CNPJ:      cnpj,
-		Email:     email,
-		Password:  password,
+		CNPJ:      dto.CNPJ,
+		Email:     dto.Email,
+		Password:  dto.Password,
 		UpdatedAt: now,
 		CreatedAt: now,
 	}
@@ -68,7 +69,7 @@ func (s *userSvc) CreateShopkeeper(fullname, cnpj, email, password string) (int,
 		return 0, apperr.NewHttpError(http.StatusUnprocessableEntity, err.Error())
 	}
 
-	userId, err := usrRepo.Save(user)
+	userId, err := usrRepo.Save(ctx, user)
 	if err != nil {
 		return 0, err
 	}
@@ -76,10 +77,10 @@ func (s *userSvc) CreateShopkeeper(fullname, cnpj, email, password string) (int,
 	return userId, nil
 }
 
-func (s *userSvc) FindByCPF(cpf string) (*User, error) {
+func (s *userSvc) FindByCPF(ctx context.Context, cpf string) (*User, error) {
 	usrRepo := *s.userRepo
 
-	usr, err := usrRepo.FindByCPF(cpf)
+	usr, err := usrRepo.FindByCPF(ctx, cpf)
 	if err != nil {
 		return nil, err
 	}
@@ -91,10 +92,10 @@ func (s *userSvc) FindByCPF(cpf string) (*User, error) {
 	return usr, nil
 }
 
-func (s *userSvc) FindByCNPJ(cnpj string) (*User, error) {
+func (s *userSvc) FindByCNPJ(ctx context.Context, cnpj string) (*User, error) {
 	usrRepo := *s.userRepo
 
-	usr, err := usrRepo.FindByCNPJ(cnpj)
+	usr, err := usrRepo.FindByCNPJ(ctx, cnpj)
 	if err != nil {
 		return nil, err
 	}
@@ -106,10 +107,10 @@ func (s *userSvc) FindByCNPJ(cnpj string) (*User, error) {
 	return usr, nil
 }
 
-func (s *userSvc) FindByEmail(email string) (*User, error) {
+func (s *userSvc) FindByEmail(ctx context.Context, email string) (*User, error) {
 	usrRepo := *s.userRepo
 
-	usr, err := usrRepo.FindByEmail(email)
+	usr, err := usrRepo.FindByEmail(ctx, email)
 	if err != nil {
 		return nil, err
 	}
@@ -121,10 +122,10 @@ func (s *userSvc) FindByEmail(email string) (*User, error) {
 	return usr, nil
 }
 
-func (s *userSvc) FindByID(id string) (*User, error) {
+func (s *userSvc) FindByID(ctx context.Context, id string) (*User, error) {
 	usrRepo := *s.userRepo
 
-	usr, err := usrRepo.FindByID(id)
+	usr, err := usrRepo.FindByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}

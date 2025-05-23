@@ -1,9 +1,11 @@
 package user
 
+import "context"
+
 type UserRepository interface {
-	Save(u User) (int, error)
-	FindByCPF(cpf string) (*User, error)
-	FindByCNPJ(cnpj string) (*User, error)
-	FindByEmail(email string) (*User, error)
-	FindByID(id string) (*User, error)
+	Save(ctx context.Context, u User) (int, error)
+	FindByCPF(ctx context.Context, cpf string) (*User, error)
+	FindByCNPJ(ctx context.Context, cnpj string) (*User, error)
+	FindByEmail(ctx context.Context, email string) (*User, error)
+	FindByID(ctx context.Context, id string) (*User, error)
 }
