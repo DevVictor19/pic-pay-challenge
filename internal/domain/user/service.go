@@ -27,7 +27,7 @@ func (s *userSvc) CreateCommon(fullname, cpf, email, password string) (int, erro
 
 	user := User{
 		Fullname:  fullname,
-		Role:      USER_COMMON,
+		Role:      Common,
 		CPF:       cpf,
 		Email:     email,
 		Password:  password,
@@ -55,7 +55,7 @@ func (s *userSvc) CreateShopkeeper(fullname, cnpj, email, password string) (int,
 
 	user := User{
 		Fullname:  fullname,
-		Role:      USER_SHOPKEEPER,
+		Role:      Shopkeeper,
 		CNPJ:      cnpj,
 		Email:     email,
 		Password:  password,

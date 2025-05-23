@@ -7,8 +7,8 @@ import (
 type TransactionType string
 
 const (
-	TRAN_PAYMENT_RECEIVED TransactionType = "payment_received"
-	TRAN_PAYMENT_SENT     TransactionType = "payment_sent"
+	PaymentReceived TransactionType = "payment_received"
+	PaymentSent     TransactionType = "payment_sent"
 )
 
 type Transaction struct {

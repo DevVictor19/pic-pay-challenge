@@ -7,9 +7,9 @@ import (
 func TestUserValidate_ValidCommonUser(t *testing.T) {
 	user := User{
 		Fullname: "John Doe",
-		Role:     USER_COMMON,
+		Role:     Common,
 		CPF:      "12345678901", // válido para o teste
-		CNPJ:     "",            // ignorado para USER_COMMON
+		CNPJ:     "",            // ignorado para Common
 		Email:    "john@example.com",
 		Password: "password123",
 	}
@@ -22,8 +22,8 @@ func TestUserValidate_ValidCommonUser(t *testing.T) {
 func TestUserValidate_ValidShopkeeperUser(t *testing.T) {
 	user := User{
 		Fullname: "Jane Shop",
-		Role:     USER_SHOPKEEPER,
-		CPF:      "",               // ignorado para USER_SHOPKEEPER
+		Role:     Shopkeeper,
+		CPF:      "",               // ignorado para Shopkeeper
 		CNPJ:     "12345678000199", // válido para o teste
 		Email:    "jane@shop.com",
 		Password: "strongpass",
@@ -37,7 +37,7 @@ func TestUserValidate_ValidShopkeeperUser(t *testing.T) {
 func TestUserValidate_InvalidFullname(t *testing.T) {
 	user := User{
 		Fullname: "Jo",
-		Role:     USER_COMMON,
+		Role:     Common,
 		CPF:      "12345678901",
 		Email:    "john@example.com",
 		Password: "password123",
@@ -65,7 +65,7 @@ func TestUserValidate_InvalidRole(t *testing.T) {
 func TestUserValidate_InvalidCPFForCommonUser(t *testing.T) {
 	user := User{
 		Fullname: "John Doe",
-		Role:     USER_COMMON,
+		Role:     Common,
 		CPF:      "12345abc901", // inválido
 		Email:    "john@example.com",
 		Password: "password123",
@@ -79,7 +79,7 @@ func TestUserValidate_InvalidCPFForCommonUser(t *testing.T) {
 func TestUserValidate_InvalidCNPJForShopkeeperUser(t *testing.T) {
 	user := User{
 		Fullname: "Jane Shop",
-		Role:     USER_SHOPKEEPER,
+		Role:     Shopkeeper,
 		CNPJ:     "12a45678000199", // inválido
 		Email:    "jane@shop.com",
 		Password: "strongpass",
@@ -93,7 +93,7 @@ func TestUserValidate_InvalidCNPJForShopkeeperUser(t *testing.T) {
 func TestUserValidate_InvalidEmail(t *testing.T) {
 	user := User{
 		Fullname: "John Doe",
-		Role:     USER_COMMON,
+		Role:     Common,
 		CPF:      "12345678901",
 		Email:    "invalid-email",
 		Password: "password123",
@@ -107,7 +107,7 @@ func TestUserValidate_InvalidEmail(t *testing.T) {
 func TestUserValidate_InvalidPassword(t *testing.T) {
 	user := User{
 		Fullname: "John Doe",
-		Role:     USER_COMMON,
+		Role:     Common,
 		CPF:      "12345678901",
 		Email:    "john@example.com",
 		Password: "123", // senha muito curta
@@ -151,18 +151,18 @@ func TestIsValidFullname_WithSpacesOnly(t *testing.T) {
 }
 
 func TestIsValidRole_WithUserCommon(t *testing.T) {
-	role := USER_COMMON
+	role := Common
 	err := isValidRole(role)
 	if err != nil {
-		t.Error("should not return error for USER_COMMON role")
+		t.Error("should not return error for Common role")
 	}
 }
 
 func TestIsValidRole_WithUserShopkeeper(t *testing.T) {
-	role := USER_SHOPKEEPER
+	role := Shopkeeper
 	err := isValidRole(role)
 	if err != nil {
-		t.Error("should not return error for USER_SHOPKEEPER role")
+		t.Error("should not return error for Shopkeeper role")
 	}
 }
 

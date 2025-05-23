@@ -11,8 +11,8 @@ import (
 type UserRole string
 
 const (
-	USER_COMMON     UserRole = "common"
-	USER_SHOPKEEPER UserRole = "shopkeeper"
+	Common     UserRole = "common"
+	Shopkeeper UserRole = "shopkeeper"
 )
 
 type User struct {
@@ -35,11 +35,11 @@ func (u *User) Validate() error {
 		return err
 	}
 	switch u.Role {
-	case USER_COMMON:
+	case Common:
 		if err := isValidCPF(u.CPF); err != nil {
 			return err
 		}
-	case USER_SHOPKEEPER:
+	case Shopkeeper:
 		if err := isValidCNPJ(u.CNPJ); err != nil {
 			return err
 		}
@@ -63,7 +63,7 @@ func isValidFullname(str string) error {
 }
 
 func isValidRole(r UserRole) error {
-	if r != USER_COMMON && r != USER_SHOPKEEPER {
+	if r != Common && r != Shopkeeper {
 		return errors.New("role must be common or shopkeeper")
 	}
 	return nil
