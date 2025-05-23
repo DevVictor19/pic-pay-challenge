@@ -1,7 +1,7 @@
 package user
 
 import (
-	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/DevVictor19/pic-pay-challenge/internal/infra/apperr"
@@ -37,12 +37,12 @@ func (s *userSvc) CreateCommon(fullname, cpf, email, password string) (int, erro
 
 	err := user.Validate()
 	if err != nil {
-		return 0, fmt.Errorf("invalid user data: %w", apperr.ErrBadRequest)
+		return 0, apperr.NewHttpError(http.StatusUnprocessableEntity, err.Error())
 	}
 
 	userId, err := usrRepo.Save(user)
 	if err != nil {
-		return 0, fmt.Errorf("error saving user: %w", apperr.ErrInternal)
+		return 0, err
 	}
 
 	return userId, nil
@@ -65,12 +65,12 @@ func (s *userSvc) CreateShopkeeper(fullname, cnpj, email, password string) (int,
 
 	err := user.Validate()
 	if err != nil {
-		return 0, fmt.Errorf("invalid user data: %w", apperr.ErrBadRequest)
+		return 0, apperr.NewHttpError(http.StatusUnprocessableEntity, err.Error())
 	}
 
 	userId, err := usrRepo.Save(user)
 	if err != nil {
-		return 0, fmt.Errorf("error saving user: %w", apperr.ErrInternal)
+		return 0, err
 	}
 
 	return userId, nil
@@ -81,11 +81,11 @@ func (s *userSvc) FindByCPF(cpf string) (*User, error) {
 
 	usr, err := usrRepo.FindByCPF(cpf)
 	if err != nil {
-		return nil, fmt.Errorf("error finding user by cpf: %w", apperr.ErrInternal)
+		return nil, err
 	}
 
 	if usr == nil {
-		return nil, fmt.Errorf("user not found: %w", apperr.ErrNotFound)
+		return nil, apperr.NewHttpError(http.StatusNotFound, "user not found")
 	}
 
 	return usr, nil
@@ -96,11 +96,11 @@ func (s *userSvc) FindByCNPJ(cnpj string) (*User, error) {
 
 	usr, err := usrRepo.FindByCNPJ(cnpj)
 	if err != nil {
-		return nil, fmt.Errorf("error finding user by cnpj: %w", apperr.ErrInternal)
+		return nil, err
 	}
 
 	if usr == nil {
-		return nil, fmt.Errorf("user not found: %w", apperr.ErrNotFound)
+		return nil, apperr.NewHttpError(http.StatusNotFound, "user not found")
 	}
 
 	return usr, nil
@@ -111,11 +111,11 @@ func (s *userSvc) FindByEmail(email string) (*User, error) {
 
 	usr, err := usrRepo.FindByEmail(email)
 	if err != nil {
-		return nil, fmt.Errorf("error finding user by email: %w", apperr.ErrInternal)
+		return nil, err
 	}
 
 	if usr == nil {
-		return nil, fmt.Errorf("user not found: %w", apperr.ErrNotFound)
+		return nil, apperr.NewHttpError(http.StatusNotFound, "user not found")
 	}
 
 	return usr, nil
@@ -126,11 +126,11 @@ func (s *userSvc) FindByID(id string) (*User, error) {
 
 	usr, err := usrRepo.FindByID(id)
 	if err != nil {
-		return nil, fmt.Errorf("error finding user by id: %w", apperr.ErrInternal)
+		return nil, err
 	}
 
 	if usr == nil {
-		return nil, fmt.Errorf("user not found: %w", apperr.ErrNotFound)
+		return nil, apperr.NewHttpError(http.StatusNotFound, "user not found")
 	}
 
 	return usr, nil

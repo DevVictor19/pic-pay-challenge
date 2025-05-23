@@ -1,12 +1,17 @@
 package apperr
 
-import "errors"
+type httpError struct {
+	Code    int    `json:"status_code"`
+	Message string `json:"message"`
+}
 
-type HttpErrCode error
+func (e *httpError) Error() string {
+	return e.Message
+}
 
-var (
-	ErrNotFound   HttpErrCode = errors.New("NOT_FOUND")
-	ErrBadRequest HttpErrCode = errors.New("BAD_REQUEST")
-	ErrConflict   HttpErrCode = errors.New("CONFLICT")
-	ErrInternal   HttpErrCode = errors.New("INTERNAL")
-)
+func NewHttpError(code int, msg string) error {
+	return &httpError{
+		Code:    code,
+		Message: msg,
+	}
+}

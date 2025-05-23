@@ -1,7 +1,7 @@
 package wallet
 
 import (
-	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/DevVictor19/pic-pay-challenge/internal/infra/apperr"
@@ -28,11 +28,11 @@ func (s *walletSvc) Create(userID int, balance int64) error {
 	}
 
 	if err := wall.Validate(); err != nil {
-		return fmt.Errorf("invalid wallet data: %w", apperr.ErrBadRequest)
+		return apperr.NewHttpError(http.StatusUnprocessableEntity, err.Error())
 	}
 
 	if err := wallRepo.Save(wall); err != nil {
-		return fmt.Errorf("error saving wallet: %w", apperr.ErrInternal)
+		return err
 	}
 
 	return nil
