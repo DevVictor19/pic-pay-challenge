@@ -62,7 +62,7 @@ func TestWalletService_CreateWithInvalidBalance(t *testing.T) {
 
 	service := NewWalletService(mockRepo)
 
-	err := service.Create(context.Background(), 0, -1000)
+	err := service.Create(context.Background(), 1, -1000)
 	var httpError *apperr.HttpError
 	assert.ErrorAs(t, err, &httpError)
 	assert.EqualValues(t, httpError.Code, http.StatusUnprocessableEntity)
