@@ -1,4 +1,4 @@
-package configs
+package server
 
 import (
 	"errors"
@@ -10,7 +10,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 )
 
-func StartServer() error {
+func Start() error {
 	port := ":3000"
 	hdl := mount()
 
