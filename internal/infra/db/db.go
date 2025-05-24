@@ -9,6 +9,8 @@ import (
 	_ "github.com/lib/pq"
 )
 
+const QueryDuration = time.Second * 5
+
 var dbRef *sql.DB
 
 func Get() (*sql.DB, error) {
