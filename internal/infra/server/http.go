@@ -2,28 +2,31 @@ package server
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"time"
 
+	"github.com/DevVictor19/pic-pay-challenge/internal/infra/env"
 	"github.com/DevVictor19/pic-pay-challenge/internal/infra/utils"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
 
 func Start() error {
-	port := ":3000"
-	hdl := mount()
+	cfg, err := env.LoadEnv()
+	if err != nil {
+		return err
+	}
 
 	srv := &http.Server{
-		Addr:         port,
-		Handler:      hdl,
+		Addr:         fmt.Sprintf(":%s", cfg.ServerPort),
+		Handler:      mount(),
 		WriteTimeout: time.Second * 30,
 		ReadTimeout:  time.Second * 10,
 		IdleTimeout:  time.Minute,
 	}
 
-	err := srv.ListenAndServe()
-	if !errors.Is(err, http.ErrServerClosed) {
+	if err := srv.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
 		return err
 	}
 
