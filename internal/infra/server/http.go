@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/DevVictor19/pic-pay-challenge/internal/infra/db"
 	"github.com/DevVictor19/pic-pay-challenge/internal/infra/env"
 	"github.com/DevVictor19/pic-pay-challenge/internal/infra/utils"
 	"github.com/go-chi/chi/v5"
@@ -17,6 +18,17 @@ func Start() error {
 	if err != nil {
 		return err
 	}
+
+	database, err := db.Connect(
+		cfg.DB.URL,
+		cfg.DB.MaxOpenConns,
+		cfg.DB.MaxIdleConns,
+		cfg.DB.MaxIdleTime,
+	)
+	if err != nil {
+		return err
+	}
+	defer database.Close()
 
 	srv := &http.Server{
 		Addr:         fmt.Sprintf(":%s", cfg.ServerPort),

@@ -41,7 +41,7 @@ func LoadEnv() (*Config, error) {
 			URL:          getString("DB_URL", "postgres://admin:admin@localhost/picpay?sslmode=disable"),
 			MaxOpenConns: getInt("DB_MAX_OPEN_CONNS", 30),
 			MaxIdleConns: getInt("DB_MAX_IDLE_CONNS", 30),
-			MaxIdleTime:  getString("DB_MAX_IDLE_TIME", "15min"),
+			MaxIdleTime:  getString("DB_MAX_IDLE_TIME", "15m"),
 		},
 	}
 

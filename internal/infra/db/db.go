@@ -3,10 +3,22 @@ package db
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"time"
+
+	_ "github.com/lib/pq"
 )
 
-func New(url string, maxOpenConns, maxIdleConns int, maxIdleTime string) (*sql.DB, error) {
+var dbRef *sql.DB
+
+func Get() (*sql.DB, error) {
+	if dbRef == nil {
+		return nil, errors.New("calling Get before initialization")
+	}
+	return dbRef, nil
+}
+
+func Connect(url string, maxOpenConns, maxIdleConns int, maxIdleTime string) (*sql.DB, error) {
 	db, err := sql.Open("postgres", url)
 	if err != nil {
 		return nil, err
@@ -28,5 +40,7 @@ func New(url string, maxOpenConns, maxIdleConns int, maxIdleTime string) (*sql.D
 		return nil, err
 	}
 
-	return db, nil
+	dbRef = db
+
+	return dbRef, nil
 }
