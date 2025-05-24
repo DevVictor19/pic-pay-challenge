@@ -2,7 +2,9 @@ package auth
 
 import (
 	"context"
+	"errors"
 	"net/http"
+	"time"
 
 	"github.com/DevVictor19/pic-pay-challenge/internal/domain/user"
 	"github.com/DevVictor19/pic-pay-challenge/internal/domain/wallet"
@@ -18,6 +20,7 @@ type authSvc struct {
 	userService   *user.UserService
 	wallService   *wallet.WalletService
 	bcryptService *BcryptService
+	jwtService    *JWTService
 }
 
 func (s *authSvc) Signup(ctx context.Context, dto SignupDTO) error {
@@ -34,8 +37,11 @@ func (s *authSvc) Signup(ctx context.Context, dto SignupDTO) error {
 	}
 
 	withSameEmail, err := userService.FindByEmail(ctx, dto.Email)
-	if !apperr.IsHttpError(err) {
-		return err
+	if err != nil {
+		var httpError *apperr.HttpError
+		if ok := errors.As(err, &httpError); !ok {
+			return err
+		}
 	}
 
 	if withSameEmail != nil {
@@ -44,8 +50,11 @@ func (s *authSvc) Signup(ctx context.Context, dto SignupDTO) error {
 
 	if dto.CNPJ != nil {
 		withSameCnpj, err := userService.FindByCNPJ(ctx, *dto.CNPJ)
-		if !apperr.IsHttpError(err) {
-			return err
+		if err != nil {
+			var httpError *apperr.HttpError
+			if ok := errors.As(err, &httpError); !ok {
+				return err
+			}
 		}
 
 		if withSameCnpj != nil {
@@ -55,8 +64,11 @@ func (s *authSvc) Signup(ctx context.Context, dto SignupDTO) error {
 
 	if dto.CPF != nil {
 		withSameCpf, err := userService.FindByCPF(ctx, *dto.CPF)
-		if !apperr.IsHttpError(err) {
-			return err
+		if err != nil {
+			var httpError *apperr.HttpError
+			if ok := errors.As(err, &httpError); !ok {
+				return err
+			}
 		}
 
 		if withSameCpf != nil {
@@ -74,7 +86,7 @@ func (s *authSvc) Signup(ctx context.Context, dto SignupDTO) error {
 	if dto.CNPJ != nil {
 		id, err := userService.CreateShopkeeper(ctx, user.ShopkeeperUserDTO{
 			Fullname: dto.Fullname,
-			CNPJ:     *dto.CNPJ,
+			CNPJ:     dto.CNPJ,
 			Email:    dto.Email,
 			Password: hashed,
 		})
@@ -87,7 +99,7 @@ func (s *authSvc) Signup(ctx context.Context, dto SignupDTO) error {
 	if dto.CPF != nil {
 		id, err := userService.CreateCommon(ctx, user.CommonUserDTO{
 			Fullname: dto.Fullname,
-			CPF:      *dto.CPF,
+			CPF:      dto.CPF,
 			Email:    dto.Email,
 			Password: hashed,
 		})
@@ -106,18 +118,49 @@ func (s *authSvc) Signup(ctx context.Context, dto SignupDTO) error {
 }
 
 func (s *authSvc) Login(ctx context.Context, dto LoginDTO) (string, error) {
-	return "", nil
+	userService := *s.userService
+	bcryptService := *s.bcryptService
+	jwtService := *s.jwtService
+
+	user, err := userService.FindByEmail(ctx, dto.Email)
+	if err != nil {
+		var httpError *apperr.HttpError
+		if ok := errors.As(err, &httpError); ok {
+			return "", apperr.NewHttpError(http.StatusUnauthorized, "invalid email or password")
+		}
+
+		return "", err
+	}
+
+	isValidPwd := bcryptService.Compare(dto.Password, user.Password)
+	if !isValidPwd {
+		return "", apperr.NewHttpError(http.StatusUnauthorized, "invalid email or password")
+	}
+
+	token, err := jwtService.GenerateToken(user.ID, time.Minute*30)
+	if err != nil {
+		return "", err
+	}
+
+	return token, nil
 }
 
 var authSvcRef *authSvc
 
-func NewAuthService(usrSvc *user.UserService, wSvc *wallet.WalletService, bcrSvc *BcryptService) AuthService {
+func NewAuthService(
+	usrSvc *user.UserService,
+	wSvc *wallet.WalletService,
+	bcrSvc *BcryptService,
+	jwtSvc *JWTService) AuthService {
+
 	if authSvcRef == nil {
 		authSvcRef = &authSvc{
 			userService:   usrSvc,
 			wallService:   wSvc,
 			bcryptService: bcrSvc,
+			jwtService:    jwtSvc,
 		}
 	}
+
 	return authSvcRef
 }

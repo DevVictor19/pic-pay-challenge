@@ -6,6 +6,9 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/DevVictor19/pic-pay-challenge/internal/domain/auth"
+	"github.com/DevVictor19/pic-pay-challenge/internal/domain/user"
+	"github.com/DevVictor19/pic-pay-challenge/internal/domain/wallet"
 	"github.com/DevVictor19/pic-pay-challenge/internal/infra/db"
 	"github.com/DevVictor19/pic-pay-challenge/internal/infra/env"
 	"github.com/DevVictor19/pic-pay-challenge/internal/infra/utils"
@@ -46,6 +49,27 @@ func Start() error {
 }
 
 func mount() http.Handler {
+	cfg, err := env.GetEnv()
+	if err != nil {
+		panic(err)
+	}
+
+	database, err := db.Get()
+	if err != nil {
+		panic(err)
+	}
+
+	userRepo := user.NewUserRepository(database, db.QueryDuration)
+	userService := user.NewUserService(&userRepo)
+
+	walletRepo := wallet.NewWalletRepository(database, db.QueryDuration)
+	walletService := wallet.NewWalletService(&walletRepo)
+
+	jwtService := auth.NewJWTService(cfg.JWT.Secret, cfg.JWT.Aud, cfg.JWT.Iss)
+	bcryptService := auth.NewBcryptService()
+	authService := auth.NewAuthService(&userService, &walletService, &bcryptService, &jwtService)
+	authHandler := auth.NewAuthHandler(&authService)
+
 	r := chi.NewRouter()
 
 	r.Use(middleware.RequestID)
@@ -57,6 +81,11 @@ func mount() http.Handler {
 	r.Route("/v1", func(r chi.Router) {
 		r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
 			utils.WriteJSON(w, http.StatusOK, map[string]string{"message": "ok"})
+		})
+
+		r.Route("/auth", func(r chi.Router) {
+			r.Post("/signup", utils.MakeHandler(authHandler.Signup))
+			r.Post("/login", utils.MakeHandler(authHandler.Login))
 		})
 	})
 
