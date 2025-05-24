@@ -13,11 +13,11 @@ type WalletService interface {
 }
 
 type walletSvc struct {
-	wallRepo *WalletRepository
+	wallRepo WalletRepository
 }
 
 func (s *walletSvc) Create(ctx context.Context, userID int, balance int64) error {
-	wallRepo := *s.wallRepo
+	wallRepo := s.wallRepo
 
 	now := time.Now()
 	wall := Wallet{
@@ -41,7 +41,7 @@ func (s *walletSvc) Create(ctx context.Context, userID int, balance int64) error
 
 var walletSvcRef *walletSvc
 
-func NewWalletService(wallRepo *WalletRepository) WalletService {
+func NewWalletService(wallRepo WalletRepository) WalletService {
 	if walletSvcRef == nil {
 		walletSvcRef = &walletSvc{
 			wallRepo,
