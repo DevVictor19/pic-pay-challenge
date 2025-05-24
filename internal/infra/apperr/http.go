@@ -1,9 +1,7 @@
 package apperr
 
-import "errors"
-
 type HttpError struct {
-	Code    int    `json:"status_code"`
+	Code    int    `json:"code"`
 	Message string `json:"message"`
 }
 
@@ -16,9 +14,4 @@ func NewHttpError(code int, msg string) error {
 		Code:    code,
 		Message: msg,
 	}
-}
-
-func IsHttpError(err error) bool {
-	var httpError *HttpError
-	return err != nil && errors.As(err, &httpError)
 }
