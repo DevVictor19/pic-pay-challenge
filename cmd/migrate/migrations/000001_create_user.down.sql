@@ -1,0 +1,4 @@
+DROP TABLE IF EXISTS users;
+DROP TYPE IF EXISTS user_role;
+ALTER TABLE IF EXISTS users
+DROP CONSTRAINT IF EXISTS cpf_or_cnpj_required;
