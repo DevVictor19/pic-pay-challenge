@@ -1,6 +1,10 @@
 package wallet
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
 
 func TestWalletValidate_WithValidData(t *testing.T) {
 	wallet := Wallet{
@@ -9,9 +13,8 @@ func TestWalletValidate_WithValidData(t *testing.T) {
 	}
 
 	err := wallet.Validate()
-	if err != nil {
-		t.Errorf("expected no error for valid wallet, got: %v", err)
-	}
+
+	assert.NoError(t, err)
 }
 
 func TestWalletValidate_WithInvalidUserID(t *testing.T) {
@@ -21,9 +24,8 @@ func TestWalletValidate_WithInvalidUserID(t *testing.T) {
 	}
 
 	err := wallet.Validate()
-	if err == nil {
-		t.Error("expected error for invalid user ID, got nil")
-	}
+
+	assert.Error(t, err)
 }
 
 func TestWalletValidate_WithNegativeBalance(t *testing.T) {
@@ -33,55 +35,42 @@ func TestWalletValidate_WithNegativeBalance(t *testing.T) {
 	}
 
 	err := wallet.Validate()
-	if err == nil {
-		t.Error("expected error for negative balance, got nil")
-	}
+
+	assert.Error(t, err)
 }
 
 func TestIsValidUserID_WithValidID(t *testing.T) {
 	userID := 1
 	err := isValidUserID(userID)
-	if err != nil {
-		t.Errorf("expected no error for valid user ID, got: %v", err)
-	}
+	assert.NoError(t, err)
 }
 
 func TestIsValidUserID_WithZeroID(t *testing.T) {
 	userID := 0
 	err := isValidUserID(userID)
-	if err == nil {
-		t.Error("expected error for user ID equal to 0, got nil")
-	}
+	assert.Error(t, err)
 }
 
 func TestIsValidUserID_WithNegativeID(t *testing.T) {
 	userID := -10
 	err := isValidUserID(userID)
-	if err == nil {
-		t.Error("expected error for negative user ID, got nil")
-	}
+	assert.Error(t, err)
 }
 
 func TestIsValidBalance_WithPositiveBalance(t *testing.T) {
 	balance := int64(100)
 	err := isValidBalance(balance)
-	if err != nil {
-		t.Errorf("expected no error for positive balance, got: %v", err)
-	}
+	assert.NoError(t, err)
 }
 
 func TestIsValidBalance_WithZeroBalance(t *testing.T) {
 	balance := int64(0)
 	err := isValidBalance(balance)
-	if err != nil {
-		t.Errorf("expected no error for zero balance, got: %v", err)
-	}
+	assert.NoError(t, err)
 }
 
 func TestIsValidBalance_WithNegativeBalance(t *testing.T) {
 	balance := int64(-50)
 	err := isValidBalance(balance)
-	if err == nil {
-		t.Error("expected error for negative balance, got nil")
-	}
+	assert.Error(t, err)
 }
