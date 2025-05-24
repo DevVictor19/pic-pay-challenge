@@ -18,11 +18,11 @@ type UserService interface {
 }
 
 type userSvc struct {
-	userRepo *UserRepository
+	userRepo UserRepository
 }
 
 func (s *userSvc) CreateCommon(ctx context.Context, dto CommonUserDTO) (int, error) {
-	usrRepo := *s.userRepo
+	usrRepo := s.userRepo
 
 	now := time.Now()
 
@@ -50,7 +50,7 @@ func (s *userSvc) CreateCommon(ctx context.Context, dto CommonUserDTO) (int, err
 }
 
 func (s *userSvc) CreateShopkeeper(ctx context.Context, dto ShopkeeperUserDTO) (int, error) {
-	usrRepo := *s.userRepo
+	usrRepo := s.userRepo
 
 	now := time.Now()
 
@@ -78,7 +78,7 @@ func (s *userSvc) CreateShopkeeper(ctx context.Context, dto ShopkeeperUserDTO) (
 }
 
 func (s *userSvc) FindByCPF(ctx context.Context, cpf string) (*User, error) {
-	usrRepo := *s.userRepo
+	usrRepo := s.userRepo
 
 	usr, err := usrRepo.FindByCPF(ctx, cpf)
 	if err != nil {
@@ -93,7 +93,7 @@ func (s *userSvc) FindByCPF(ctx context.Context, cpf string) (*User, error) {
 }
 
 func (s *userSvc) FindByCNPJ(ctx context.Context, cnpj string) (*User, error) {
-	usrRepo := *s.userRepo
+	usrRepo := s.userRepo
 
 	usr, err := usrRepo.FindByCNPJ(ctx, cnpj)
 	if err != nil {
@@ -108,7 +108,7 @@ func (s *userSvc) FindByCNPJ(ctx context.Context, cnpj string) (*User, error) {
 }
 
 func (s *userSvc) FindByEmail(ctx context.Context, email string) (*User, error) {
-	usrRepo := *s.userRepo
+	usrRepo := s.userRepo
 
 	usr, err := usrRepo.FindByEmail(ctx, email)
 	if err != nil {
@@ -123,7 +123,7 @@ func (s *userSvc) FindByEmail(ctx context.Context, email string) (*User, error) 
 }
 
 func (s *userSvc) FindByID(ctx context.Context, id int) (*User, error) {
-	usrRepo := *s.userRepo
+	usrRepo := s.userRepo
 
 	usr, err := usrRepo.FindByID(ctx, id)
 	if err != nil {
@@ -137,13 +137,8 @@ func (s *userSvc) FindByID(ctx context.Context, id int) (*User, error) {
 	return usr, nil
 }
 
-var userSvcRef *userSvc
-
-func NewUserService(userRepo *UserRepository) UserService {
-	if userSvcRef == nil {
-		userSvcRef = &userSvc{
-			userRepo,
-		}
+func NewUserService(userRepo UserRepository) UserService {
+	return &userSvc{
+		userRepo,
 	}
-	return userSvcRef
 }

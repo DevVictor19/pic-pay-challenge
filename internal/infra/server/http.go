@@ -60,15 +60,15 @@ func mount() http.Handler {
 	}
 
 	userRepo := user.NewUserRepository(database, db.QueryDuration)
-	userService := user.NewUserService(&userRepo)
+	userService := user.NewUserService(userRepo)
 
 	walletRepo := wallet.NewWalletRepository(database, db.QueryDuration)
 	walletService := wallet.NewWalletService(walletRepo)
 
 	jwtService := auth.NewJWTService(cfg.JWT.Secret, cfg.JWT.Aud, cfg.JWT.Iss)
 	bcryptService := auth.NewBcryptService()
-	authService := auth.NewAuthService(&userService, &walletService, &bcryptService, &jwtService)
-	authHandler := auth.NewAuthHandler(&authService)
+	authService := auth.NewAuthService(userService, walletService, bcryptService, jwtService)
+	authHandler := auth.NewAuthHandler(authService)
 
 	r := chi.NewRouter()
 

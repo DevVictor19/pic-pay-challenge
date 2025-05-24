@@ -17,16 +17,16 @@ type AuthService interface {
 }
 
 type authSvc struct {
-	userService   *user.UserService
-	wallService   *wallet.WalletService
-	bcryptService *BcryptService
-	jwtService    *JWTService
+	userService   user.UserService
+	wallService   wallet.WalletService
+	bcryptService BcryptService
+	jwtService    JWTService
 }
 
 func (s *authSvc) Signup(ctx context.Context, dto SignupDTO) error {
-	userService := *s.userService
-	wallService := *s.wallService
-	bcryptService := *s.bcryptService
+	userService := s.userService
+	wallService := s.wallService
+	bcryptService := s.bcryptService
 
 	if dto.CNPJ == nil && dto.CPF == nil {
 		return apperr.NewHttpError(http.StatusBadRequest, "CPF or CNPJ must be passed")
@@ -118,9 +118,9 @@ func (s *authSvc) Signup(ctx context.Context, dto SignupDTO) error {
 }
 
 func (s *authSvc) Login(ctx context.Context, dto LoginDTO) (string, error) {
-	userService := *s.userService
-	bcryptService := *s.bcryptService
-	jwtService := *s.jwtService
+	userService := s.userService
+	bcryptService := s.bcryptService
+	jwtService := s.jwtService
 
 	user, err := userService.FindByEmail(ctx, dto.Email)
 	if err != nil {
@@ -145,22 +145,16 @@ func (s *authSvc) Login(ctx context.Context, dto LoginDTO) (string, error) {
 	return token, nil
 }
 
-var authSvcRef *authSvc
-
 func NewAuthService(
-	usrSvc *user.UserService,
-	wSvc *wallet.WalletService,
-	bcrSvc *BcryptService,
-	jwtSvc *JWTService) AuthService {
+	usrSvc user.UserService,
+	wSvc wallet.WalletService,
+	bcrSvc BcryptService,
+	jwtSvc JWTService) AuthService {
 
-	if authSvcRef == nil {
-		authSvcRef = &authSvc{
-			userService:   usrSvc,
-			wallService:   wSvc,
-			bcryptService: bcrSvc,
-			jwtService:    jwtSvc,
-		}
+	return &authSvc{
+		userService:   usrSvc,
+		wallService:   wSvc,
+		bcryptService: bcrSvc,
+		jwtService:    jwtSvc,
 	}
-
-	return authSvcRef
 }

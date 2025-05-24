@@ -45,14 +45,9 @@ func (r *walletRepo) Save(ctx context.Context, w Wallet) error {
 	return nil
 }
 
-var wallRepoRef *walletRepo
-
 func NewWalletRepository(database *sql.DB, qt time.Duration) WalletRepository {
-	if wallRepoRef == nil {
-		wallRepoRef = &walletRepo{
-			database:     database,
-			queryTimeout: qt,
-		}
+	return &walletRepo{
+		database:     database,
+		queryTimeout: qt,
 	}
-	return wallRepoRef
 }

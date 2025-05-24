@@ -39,13 +39,8 @@ func (s *walletSvc) Create(ctx context.Context, userID int, balance int64) error
 	return nil
 }
 
-var walletSvcRef *walletSvc
-
 func NewWalletService(wallRepo WalletRepository) WalletService {
-	if walletSvcRef == nil {
-		walletSvcRef = &walletSvc{
-			wallRepo,
-		}
+	return &walletSvc{
+		wallRepo,
 	}
-	return walletSvcRef
 }

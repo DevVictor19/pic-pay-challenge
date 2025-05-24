@@ -8,11 +8,11 @@ import (
 )
 
 type AuthHandler struct {
-	authService *AuthService
+	authService AuthService
 }
 
 func (h *AuthHandler) Signup(w http.ResponseWriter, r *http.Request) error {
-	authService := *h.authService
+	authService := h.authService
 
 	var body SignupDTO
 	if err := utils.ReadJSON(w, r, &body); err != nil {
@@ -33,7 +33,7 @@ func (h *AuthHandler) Signup(w http.ResponseWriter, r *http.Request) error {
 }
 
 func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) error {
-	authService := *h.authService
+	authService := h.authService
 
 	var body LoginDTO
 	if err := utils.ReadJSON(w, r, &body); err != nil {
@@ -56,11 +56,8 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) error {
 
 var authHdlRef *AuthHandler
 
-func NewAuthHandler(authService *AuthService) *AuthHandler {
-	if authHdlRef == nil {
-		authHdlRef = &AuthHandler{
-			authService,
-		}
+func NewAuthHandler(authService AuthService) *AuthHandler {
+	return &AuthHandler{
+		authService,
 	}
-	return authHdlRef
 }

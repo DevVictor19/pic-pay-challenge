@@ -201,14 +201,9 @@ func (r *userRepo) FindByID(ctx context.Context, id int) (*User, error) {
 	return &u, nil
 }
 
-var userRepoRef *userRepo
-
 func NewUserRepository(database *sql.DB, qt time.Duration) UserRepository {
-	if userRepoRef == nil {
-		userRepoRef = &userRepo{
-			database:     database,
-			queryTimeout: qt,
-		}
+	return &userRepo{
+		database:     database,
+		queryTimeout: qt,
 	}
-	return userRepoRef
 }
