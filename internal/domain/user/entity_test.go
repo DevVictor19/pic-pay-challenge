@@ -5,11 +5,11 @@ import (
 )
 
 func TestUserValidate_ValidCommonUser(t *testing.T) {
+	cpf := "12345678901"
 	user := User{
 		Fullname: "John Doe",
 		Role:     Common,
-		CPF:      "12345678901", // válido para o teste
-		CNPJ:     "",            // ignorado para Common
+		CPF:      &cpf, // válido para o teste
 		Email:    "john@example.com",
 		Password: "password123",
 	}
@@ -20,11 +20,11 @@ func TestUserValidate_ValidCommonUser(t *testing.T) {
 }
 
 func TestUserValidate_ValidShopkeeperUser(t *testing.T) {
+	cnpj := "12345678000199"
 	user := User{
 		Fullname: "Jane Shop",
 		Role:     Shopkeeper,
-		CPF:      "",               // ignorado para Shopkeeper
-		CNPJ:     "12345678000199", // válido para o teste
+		CNPJ:     &cnpj, // válido para o teste
 		Email:    "jane@shop.com",
 		Password: "strongpass",
 	}
@@ -35,10 +35,11 @@ func TestUserValidate_ValidShopkeeperUser(t *testing.T) {
 }
 
 func TestUserValidate_InvalidFullname(t *testing.T) {
+	cpf := "12345678901"
 	user := User{
 		Fullname: "Jo",
 		Role:     Common,
-		CPF:      "12345678901",
+		CPF:      &cpf,
 		Email:    "john@example.com",
 		Password: "password123",
 	}
@@ -49,10 +50,11 @@ func TestUserValidate_InvalidFullname(t *testing.T) {
 }
 
 func TestUserValidate_InvalidRole(t *testing.T) {
+	cpf := "12345678901"
 	user := User{
 		Fullname: "John Doe",
 		Role:     "INVALID_ROLE",
-		CPF:      "12345678901",
+		CPF:      &cpf,
 		Email:    "john@example.com",
 		Password: "password123",
 	}
@@ -63,10 +65,11 @@ func TestUserValidate_InvalidRole(t *testing.T) {
 }
 
 func TestUserValidate_InvalidCPFForCommonUser(t *testing.T) {
+	cpf := "12345abc901"
 	user := User{
 		Fullname: "John Doe",
 		Role:     Common,
-		CPF:      "12345abc901", // inválido
+		CPF:      &cpf, // inválido
 		Email:    "john@example.com",
 		Password: "password123",
 	}
@@ -77,10 +80,11 @@ func TestUserValidate_InvalidCPFForCommonUser(t *testing.T) {
 }
 
 func TestUserValidate_InvalidCNPJForShopkeeperUser(t *testing.T) {
+	cnpj := "12a45678000199"
 	user := User{
 		Fullname: "Jane Shop",
 		Role:     Shopkeeper,
-		CNPJ:     "12a45678000199", // inválido
+		CNPJ:     &cnpj, // inválido
 		Email:    "jane@shop.com",
 		Password: "strongpass",
 	}
@@ -91,10 +95,11 @@ func TestUserValidate_InvalidCNPJForShopkeeperUser(t *testing.T) {
 }
 
 func TestUserValidate_InvalidEmail(t *testing.T) {
+	cpf := "12345678901"
 	user := User{
 		Fullname: "John Doe",
 		Role:     Common,
-		CPF:      "12345678901",
+		CPF:      &cpf,
 		Email:    "invalid-email",
 		Password: "password123",
 	}
@@ -105,10 +110,11 @@ func TestUserValidate_InvalidEmail(t *testing.T) {
 }
 
 func TestUserValidate_InvalidPassword(t *testing.T) {
+	cpf := "12345678901"
 	user := User{
 		Fullname: "John Doe",
 		Role:     Common,
-		CPF:      "12345678901",
+		CPF:      &cpf,
 		Email:    "john@example.com",
 		Password: "123", // senha muito curta
 	}

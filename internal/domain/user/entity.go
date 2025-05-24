@@ -19,8 +19,8 @@ type User struct {
 	ID        int       `json:"id"`
 	Fullname  string    `json:"fullname"`
 	Role      UserRole  `json:"role"`
-	CPF       string    `json:"cpf"`
-	CNPJ      string    `json:"cnpj"`
+	CPF       *string   `json:"cpf"`
+	CNPJ      *string   `json:"cnpj"`
 	Email     string    `json:"email"`
 	Password  string    `json:"-"`
 	UpdatedAt time.Time `json:"updated_at"`
@@ -36,11 +36,11 @@ func (u *User) Validate() error {
 	}
 	switch u.Role {
 	case Common:
-		if err := isValidCPF(u.CPF); err != nil {
+		if err := isValidCPF(*u.CPF); err != nil {
 			return err
 		}
 	case Shopkeeper:
-		if err := isValidCNPJ(u.CNPJ); err != nil {
+		if err := isValidCNPJ(*u.CNPJ); err != nil {
 			return err
 		}
 	default:

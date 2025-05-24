@@ -14,7 +14,7 @@ type UserService interface {
 	FindByCPF(ctx context.Context, cpf string) (*User, error)
 	FindByCNPJ(ctx context.Context, cnpj string) (*User, error)
 	FindByEmail(ctx context.Context, email string) (*User, error)
-	FindByID(ctx context.Context, id string) (*User, error)
+	FindByID(ctx context.Context, id int) (*User, error)
 }
 
 type userSvc struct {
@@ -122,7 +122,7 @@ func (s *userSvc) FindByEmail(ctx context.Context, email string) (*User, error) 
 	return usr, nil
 }
 
-func (s *userSvc) FindByID(ctx context.Context, id string) (*User, error) {
+func (s *userSvc) FindByID(ctx context.Context, id int) (*User, error) {
 	usrRepo := *s.userRepo
 
 	usr, err := usrRepo.FindByID(ctx, id)
