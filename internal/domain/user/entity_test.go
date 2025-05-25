@@ -6,214 +6,246 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestUserValidate_ValidCommonUser(t *testing.T) {
-	cpf := "12345678901"
-	user := User{
-		Fullname: "John Doe",
-		Role:     Common,
-		CPF:      &cpf, // válido para o teste
-		Email:    "john@example.com",
-		Password: "password123",
+func TestUserValidate(t *testing.T) {
+	t.Run("Valid Common User", func(t *testing.T) {
+		cpf := "12345678901"
+		user := User{
+			Fullname: "John Doe",
+			Role:     Common,
+			CPF:      &cpf,
+			Email:    "john@example.com",
+			Password: "password123",
+		}
+		err := user.Validate()
+		assert.NoError(t, err)
+	})
+
+	t.Run("Valid Shopkeeper User", func(t *testing.T) {
+		cnpj := "12345678000199"
+		user := User{
+			Fullname: "Jane Shop",
+			Role:     Shopkeeper,
+			CNPJ:     &cnpj,
+			Email:    "jane@shop.com",
+			Password: "strongpass",
+		}
+		err := user.Validate()
+		assert.NoError(t, err)
+	})
+
+	t.Run("Invalid Fullname", func(t *testing.T) {
+		cpf := "12345678901"
+		user := User{
+			Fullname: "Jo",
+			Role:     Common,
+			CPF:      &cpf,
+			Email:    "john@example.com",
+			Password: "password123",
+		}
+		err := user.Validate()
+		assert.Error(t, err)
+	})
+
+	t.Run("Invalid Role", func(t *testing.T) {
+		cpf := "12345678901"
+		user := User{
+			Fullname: "John Doe",
+			Role:     "INVALID_ROLE",
+			CPF:      &cpf,
+			Email:    "john@example.com",
+			Password: "password123",
+		}
+		err := user.Validate()
+		assert.Error(t, err)
+	})
+
+	t.Run("Invalid CPF for Common User", func(t *testing.T) {
+		cpf := "12345abc901"
+		user := User{
+			Fullname: "John Doe",
+			Role:     Common,
+			CPF:      &cpf,
+			Email:    "john@example.com",
+			Password: "password123",
+		}
+		err := user.Validate()
+		assert.Error(t, err)
+	})
+
+	t.Run("Invalid CNPJ for Shopkeeper User", func(t *testing.T) {
+		cnpj := "12a45678000199"
+		user := User{
+			Fullname: "Jane Shop",
+			Role:     Shopkeeper,
+			CNPJ:     &cnpj,
+			Email:    "jane@shop.com",
+			Password: "strongpass",
+		}
+		err := user.Validate()
+		assert.Error(t, err)
+	})
+
+	t.Run("Invalid Email", func(t *testing.T) {
+		cpf := "12345678901"
+		user := User{
+			Fullname: "John Doe",
+			Role:     Common,
+			CPF:      &cpf,
+			Email:    "invalid-email",
+			Password: "password123",
+		}
+		err := user.Validate()
+		assert.Error(t, err)
+	})
+
+	t.Run("Invalid Password", func(t *testing.T) {
+		cpf := "12345678901"
+		user := User{
+			Fullname: "John Doe",
+			Role:     Common,
+			CPF:      &cpf,
+			Email:    "john@example.com",
+			Password: "123",
+		}
+		err := user.Validate()
+		assert.Error(t, err)
+	})
+}
+
+func TestIsValidFullname(t *testing.T) {
+	tests := []struct {
+		name string
+		val  string
+		want bool
+	}{
+		{"Valid Name", "John Doe", true},
+		{"Too Short", "Jo", false},
+		{"Empty String", "", false},
+		{"Spaces Only", "   ", false},
 	}
-	err := user.Validate()
-	assert.NoError(t, err)
-}
 
-func TestUserValidate_ValidShopkeeperUser(t *testing.T) {
-	cnpj := "12345678000199"
-	user := User{
-		Fullname: "Jane Shop",
-		Role:     Shopkeeper,
-		CNPJ:     &cnpj, // válido para o teste
-		Email:    "jane@shop.com",
-		Password: "strongpass",
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := isValidFullname(tt.val)
+			if tt.want {
+				assert.NoError(t, err)
+			} else {
+				assert.Error(t, err)
+			}
+		})
 	}
-	err := user.Validate()
-	assert.NoError(t, err)
 }
 
-func TestUserValidate_InvalidFullname(t *testing.T) {
-	cpf := "12345678901"
-	user := User{
-		Fullname: "Jo",
-		Role:     Common,
-		CPF:      &cpf,
-		Email:    "john@example.com",
-		Password: "password123",
+func TestIsValidRole(t *testing.T) {
+	tests := []struct {
+		name string
+		role UserRole
+		want bool
+	}{
+		{"Common Role", Common, true},
+		{"Shopkeeper Role", Shopkeeper, true},
+		{"Invalid Role", "ADMIN", false},
 	}
-	err := user.Validate()
-	assert.Error(t, err)
-}
 
-func TestUserValidate_InvalidRole(t *testing.T) {
-	cpf := "12345678901"
-	user := User{
-		Fullname: "John Doe",
-		Role:     "INVALID_ROLE",
-		CPF:      &cpf,
-		Email:    "john@example.com",
-		Password: "password123",
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := isValidRole(tt.role)
+			if tt.want {
+				assert.NoError(t, err)
+			} else {
+				assert.Error(t, err)
+			}
+		})
 	}
-	err := user.Validate()
-	assert.Error(t, err)
 }
 
-func TestUserValidate_InvalidCPFForCommonUser(t *testing.T) {
-	cpf := "12345abc901"
-	user := User{
-		Fullname: "John Doe",
-		Role:     Common,
-		CPF:      &cpf, // inválido
-		Email:    "john@example.com",
-		Password: "password123",
+func TestIsValidCPF(t *testing.T) {
+	tests := []struct {
+		name string
+		val  string
+		want bool
+	}{
+		{"Valid Input", "12345678901", true},
+		{"Less Than 11 Digits", "1234567890", false},
+		{"More Than 11 Digits", "123456789012", false},
+		{"Non Numeric Characters", "12345abc901", false},
 	}
-	err := user.Validate()
-	assert.Error(t, err)
-}
 
-func TestUserValidate_InvalidCNPJForShopkeeperUser(t *testing.T) {
-	cnpj := "12a45678000199"
-	user := User{
-		Fullname: "Jane Shop",
-		Role:     Shopkeeper,
-		CNPJ:     &cnpj, // inválido
-		Email:    "jane@shop.com",
-		Password: "strongpass",
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := isValidCPF(tt.val)
+			if tt.want {
+				assert.NoError(t, err)
+			} else {
+				assert.Error(t, err)
+			}
+		})
 	}
-	err := user.Validate()
-	assert.Error(t, err)
 }
 
-func TestUserValidate_InvalidEmail(t *testing.T) {
-	cpf := "12345678901"
-	user := User{
-		Fullname: "John Doe",
-		Role:     Common,
-		CPF:      &cpf,
-		Email:    "invalid-email",
-		Password: "password123",
+func TestIsValidCNPJ(t *testing.T) {
+	tests := []struct {
+		name string
+		val  string
+		want bool
+	}{
+		{"Valid Input", "06532946000185", true},
+		{"Invalid Characters", "06532946000abc", false},
+		{"Invalid Length", "17.901.294/0001-25", false},
 	}
-	err := user.Validate()
-	assert.Error(t, err)
-}
 
-func TestUserValidate_InvalidPassword(t *testing.T) {
-	cpf := "12345678901"
-	user := User{
-		Fullname: "John Doe",
-		Role:     Common,
-		CPF:      &cpf,
-		Email:    "john@example.com",
-		Password: "123", // senha muito curta
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := isValidCNPJ(tt.val)
+			if tt.want {
+				assert.NoError(t, err)
+			} else {
+				assert.Error(t, err)
+			}
+		})
 	}
-	err := user.Validate()
-	assert.Error(t, err)
 }
 
-func TestIsValidFullname_WithValidName(t *testing.T) {
-	val := "John Doe"
-	err := isValidFullname(val)
-	assert.NoError(t, err)
+func TestIsValidEmail(t *testing.T) {
+	tests := []struct {
+		name string
+		val  string
+		want bool
+	}{
+		{"Valid Format", "valid@email.com", true},
+		{"Invalid Format", "invalid@email..com", false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := isValidEmail(tt.val)
+			if tt.want {
+				assert.NoError(t, err)
+			} else {
+				assert.Error(t, err)
+			}
+		})
+	}
 }
 
-func TestIsValidFullname_WithNameTooShort(t *testing.T) {
-	val := "Jo"
-	err := isValidFullname(val)
-	assert.Error(t, err)
-}
+func TestIsValidPassword(t *testing.T) {
+	tests := []struct {
+		name string
+		val  string
+		want bool
+	}{
+		{"Too Short", "12345", false},
+		{"Minimum Length", "123456", true},
+	}
 
-func TestIsValidFullname_WithEmptyString(t *testing.T) {
-	val := ""
-	err := isValidFullname(val)
-	assert.Error(t, err)
-}
-
-func TestIsValidFullname_WithSpacesOnly(t *testing.T) {
-	val := "   "
-	err := isValidFullname(val)
-	assert.Error(t, err)
-}
-
-func TestIsValidRole_WithUserCommon(t *testing.T) {
-	role := Common
-	err := isValidRole(role)
-	assert.NoError(t, err)
-}
-
-func TestIsValidRole_WithUserShopkeeper(t *testing.T) {
-	role := Shopkeeper
-	err := isValidRole(role)
-	assert.NoError(t, err)
-}
-
-func TestIsValidRole_WithInvalidRole(t *testing.T) {
-	var invalidRole UserRole = "ADMIN" // supondo que ADMIN não é válido
-	err := isValidRole(invalidRole)
-	assert.Error(t, err)
-}
-
-func TestIsValidCPF_WithValidInput(t *testing.T) {
-	val := "12345678901"
-	err := isValidCPF(val)
-	assert.NoError(t, err)
-}
-
-func TestIsValidCPF_WithLessThan11Digits(t *testing.T) {
-	val := "1234567890" // 10 digits
-	err := isValidCPF(val)
-	assert.Error(t, err)
-}
-
-func TestIsValidCPF_WithMoreThan11Digits(t *testing.T) {
-	val := "123456789012" // 12 digits
-	err := isValidCPF(val)
-	assert.Error(t, err)
-}
-
-func TestIsValidCPF_WithNonNumericCharacters(t *testing.T) {
-	val := "12345abc901"
-	err := isValidCPF(val)
-	assert.Error(t, err)
-}
-
-func TestIsValidCNPJ_WithValidInput(t *testing.T) {
-	val := "06532946000185"
-	err := isValidCNPJ(val)
-	assert.NoError(t, err)
-}
-
-func TestIsValidCNPJ_WithInvalidChars(t *testing.T) {
-	val := "06532946000abc"
-	err := isValidCNPJ(val)
-	assert.Error(t, err)
-}
-
-func TestIsValidCNPJ_WithInvalidLength(t *testing.T) {
-	val := "17.901.294/0001-25"
-	err := isValidCNPJ(val)
-	assert.Error(t, err)
-}
-
-func TestIsValidEmail_WithInvalidFormat(t *testing.T) {
-	val := "invalid@email..com"
-	err := isValidEmail(val)
-	assert.Error(t, err)
-}
-
-func TestIsValidEmail_WithValidFormat(t *testing.T) {
-	val := "valid@email.com"
-	err := isValidEmail(val)
-	assert.NoError(t, err)
-}
-
-func TestIsValidPassword_WithTooShortPassword(t *testing.T) {
-	val := "12345"
-	err := isValidPassword(val)
-	assert.Error(t, err)
-}
-
-func TestIsValidPassword_WithMinimumLength(t *testing.T) {
-	val := "123456"
-	err := isValidPassword(val)
-	assert.NoError(t, err)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := isValidPassword(tt.val)
+			if tt.want {
+				assert.NoError(t, err)
+			} else {
+				assert.Error(t, err)
+			}
+		})
+	}
 }
