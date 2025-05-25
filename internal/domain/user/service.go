@@ -22,8 +22,6 @@ type userSvc struct {
 }
 
 func (s *userSvc) CreateCommon(ctx context.Context, dto CommonUserDTO) (int, error) {
-	usrRepo := s.userRepo
-
 	now := time.Now()
 
 	user := User{
@@ -41,7 +39,7 @@ func (s *userSvc) CreateCommon(ctx context.Context, dto CommonUserDTO) (int, err
 		return 0, apperr.NewHttpError(http.StatusUnprocessableEntity, err.Error())
 	}
 
-	userId, err := usrRepo.Save(ctx, user)
+	userId, err := s.userRepo.Save(ctx, user)
 	if err != nil {
 		return 0, err
 	}
@@ -50,8 +48,6 @@ func (s *userSvc) CreateCommon(ctx context.Context, dto CommonUserDTO) (int, err
 }
 
 func (s *userSvc) CreateShopkeeper(ctx context.Context, dto ShopkeeperUserDTO) (int, error) {
-	usrRepo := s.userRepo
-
 	now := time.Now()
 
 	user := User{
@@ -69,7 +65,7 @@ func (s *userSvc) CreateShopkeeper(ctx context.Context, dto ShopkeeperUserDTO) (
 		return 0, apperr.NewHttpError(http.StatusUnprocessableEntity, err.Error())
 	}
 
-	userId, err := usrRepo.Save(ctx, user)
+	userId, err := s.userRepo.Save(ctx, user)
 	if err != nil {
 		return 0, err
 	}
@@ -78,9 +74,7 @@ func (s *userSvc) CreateShopkeeper(ctx context.Context, dto ShopkeeperUserDTO) (
 }
 
 func (s *userSvc) FindByCPF(ctx context.Context, cpf string) (*User, error) {
-	usrRepo := s.userRepo
-
-	usr, err := usrRepo.FindByCPF(ctx, cpf)
+	usr, err := s.userRepo.FindByCPF(ctx, cpf)
 	if err != nil {
 		return nil, err
 	}
@@ -93,9 +87,7 @@ func (s *userSvc) FindByCPF(ctx context.Context, cpf string) (*User, error) {
 }
 
 func (s *userSvc) FindByCNPJ(ctx context.Context, cnpj string) (*User, error) {
-	usrRepo := s.userRepo
-
-	usr, err := usrRepo.FindByCNPJ(ctx, cnpj)
+	usr, err := s.userRepo.FindByCNPJ(ctx, cnpj)
 	if err != nil {
 		return nil, err
 	}
@@ -108,9 +100,7 @@ func (s *userSvc) FindByCNPJ(ctx context.Context, cnpj string) (*User, error) {
 }
 
 func (s *userSvc) FindByEmail(ctx context.Context, email string) (*User, error) {
-	usrRepo := s.userRepo
-
-	usr, err := usrRepo.FindByEmail(ctx, email)
+	usr, err := s.userRepo.FindByEmail(ctx, email)
 	if err != nil {
 		return nil, err
 	}
@@ -123,9 +113,7 @@ func (s *userSvc) FindByEmail(ctx context.Context, email string) (*User, error) 
 }
 
 func (s *userSvc) FindByID(ctx context.Context, id int) (*User, error) {
-	usrRepo := s.userRepo
-
-	usr, err := usrRepo.FindByID(ctx, id)
+	usr, err := s.userRepo.FindByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}

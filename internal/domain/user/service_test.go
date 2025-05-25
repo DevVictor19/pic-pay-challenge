@@ -1,4 +1,4 @@
-package user
+package user_test
 
 import (
 	"context"
@@ -6,18 +6,20 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/DevVictor19/pic-pay-challenge/internal/domain/user"
 	"github.com/DevVictor19/pic-pay-challenge/internal/infra/apperr"
+	"github.com/DevVictor19/pic-pay-challenge/internal/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
 
 func TestUserService_CreateCommon(t *testing.T) {
 	t.Run("should return unprocessable entity if validation fails", func(t *testing.T) {
-		mockRepo := new(MockUserRepository)
-		service := &userSvc{userRepo: mockRepo}
+		mockRepo := new(mocks.MockUserRepository)
+		service := user.NewUserService(mockRepo)
 
 		cpf := "12345678900"
-		dto := CommonUserDTO{
+		dto := user.CommonUserDTO{
 			Fullname: "",
 			CPF:      &cpf,
 			Email:    "test@test.com",
@@ -36,15 +38,15 @@ func TestUserService_CreateCommon(t *testing.T) {
 	})
 
 	t.Run("should return error if database fails", func(t *testing.T) {
-		mockRepo := new(MockUserRepository)
+		mockRepo := new(mocks.MockUserRepository)
 		mockRepo.
 			On("Save", mock.Anything, mock.Anything).
 			Return(0, errors.New("db fail"))
 
-		service := &userSvc{userRepo: mockRepo}
+		service := user.NewUserService(mockRepo)
 
 		cpf := "12345678900"
-		dto := CommonUserDTO{
+		dto := user.CommonUserDTO{
 			Fullname: "John Doe",
 			CPF:      &cpf,
 			Email:    "test@test.com",
@@ -61,19 +63,19 @@ func TestUserService_CreateCommon(t *testing.T) {
 	})
 
 	t.Run("should create a common user and return id", func(t *testing.T) {
-		mockRepo := new(MockUserRepository)
+		mockRepo := new(mocks.MockUserRepository)
 
-		var entity User
+		var entity user.User
 
 		mockRepo.On("Save", mock.Anything, mock.Anything).
 			Run(func(args mock.Arguments) {
-				entity = args.Get(1).(User)
+				entity = args.Get(1).(user.User)
 			}).Return(0, nil)
 
-		service := &userSvc{userRepo: mockRepo}
+		service := user.NewUserService(mockRepo)
 
 		cpf := "12345678900"
-		dto := CommonUserDTO{
+		dto := user.CommonUserDTO{
 			Fullname: "John Doe",
 			CPF:      &cpf,
 			Email:    "test@test.com",
@@ -88,7 +90,7 @@ func TestUserService_CreateCommon(t *testing.T) {
 		assert.Nil(t, entity.CNPJ)
 		assert.Equal(t, dto.Email, entity.Email)
 		assert.Equal(t, dto.Password, entity.Password)
-		assert.Equal(t, entity.Role, Common)
+		assert.Equal(t, entity.Role, user.Common)
 		assert.Equal(t, 0, id)
 
 		mockRepo.AssertExpectations(t)
@@ -97,11 +99,11 @@ func TestUserService_CreateCommon(t *testing.T) {
 
 func TestUserService_CreateShopkeeper(t *testing.T) {
 	t.Run("should return unprocessable entity if validation fails", func(t *testing.T) {
-		mockRepo := new(MockUserRepository)
-		service := &userSvc{userRepo: mockRepo}
+		mockRepo := new(mocks.MockUserRepository)
+		service := user.NewUserService(mockRepo)
 
 		cnpj := "12345678901234"
-		dto := ShopkeeperUserDTO{
+		dto := user.ShopkeeperUserDTO{
 			Fullname: "",
 			CNPJ:     &cnpj,
 			Email:    "test@test.com",
@@ -120,15 +122,15 @@ func TestUserService_CreateShopkeeper(t *testing.T) {
 	})
 
 	t.Run("should return error if database fails", func(t *testing.T) {
-		mockRepo := new(MockUserRepository)
+		mockRepo := new(mocks.MockUserRepository)
 		mockRepo.
 			On("Save", mock.Anything, mock.Anything).
 			Return(0, errors.New("db fail"))
 
-		service := &userSvc{userRepo: mockRepo}
+		service := user.NewUserService(mockRepo)
 
 		cnpj := "12345678901234"
-		dto := ShopkeeperUserDTO{
+		dto := user.ShopkeeperUserDTO{
 			Fullname: "John Doe",
 			CNPJ:     &cnpj,
 			Email:    "test@test.com",
@@ -145,19 +147,19 @@ func TestUserService_CreateShopkeeper(t *testing.T) {
 	})
 
 	t.Run("should create a shopkeeper user and return id", func(t *testing.T) {
-		mockRepo := new(MockUserRepository)
+		mockRepo := new(mocks.MockUserRepository)
 
-		var entity User
+		var entity user.User
 
 		mockRepo.On("Save", mock.Anything, mock.Anything).
 			Run(func(args mock.Arguments) {
-				entity = args.Get(1).(User)
+				entity = args.Get(1).(user.User)
 			}).Return(0, nil)
 
-		service := &userSvc{userRepo: mockRepo}
+		service := user.NewUserService(mockRepo)
 
 		cnpj := "12345678901234"
-		dto := ShopkeeperUserDTO{
+		dto := user.ShopkeeperUserDTO{
 			Fullname: "John Doe",
 			CNPJ:     &cnpj,
 			Email:    "test@test.com",
@@ -172,7 +174,7 @@ func TestUserService_CreateShopkeeper(t *testing.T) {
 		assert.Nil(t, entity.CPF)
 		assert.Equal(t, dto.Email, entity.Email)
 		assert.Equal(t, dto.Password, entity.Password)
-		assert.Equal(t, entity.Role, Shopkeeper)
+		assert.Equal(t, entity.Role, user.Shopkeeper)
 		assert.Equal(t, 0, id)
 
 		mockRepo.AssertExpectations(t)
@@ -181,12 +183,12 @@ func TestUserService_CreateShopkeeper(t *testing.T) {
 
 func TestUserService_FindByCPF(t *testing.T) {
 	t.Run("should return error if db fails", func(t *testing.T) {
-		mockRepo := new(MockUserRepository)
+		mockRepo := new(mocks.MockUserRepository)
 		mockRepo.
 			On("FindByCPF", mock.Anything, mock.Anything).
 			Return(nil, errors.New("db fail"))
 
-		service := &userSvc{userRepo: mockRepo}
+		service := user.NewUserService(mockRepo)
 		user, err := service.FindByCPF(context.Background(), "123")
 
 		assert.Error(t, err)
@@ -197,12 +199,12 @@ func TestUserService_FindByCPF(t *testing.T) {
 	})
 
 	t.Run("should return not found if user is nil", func(t *testing.T) {
-		mockRepo := new(MockUserRepository)
+		mockRepo := new(mocks.MockUserRepository)
 		mockRepo.
 			On("FindByCPF", mock.Anything, mock.Anything).
 			Return(nil, nil)
 
-		service := &userSvc{userRepo: mockRepo}
+		service := user.NewUserService(mockRepo)
 		user, err := service.FindByCPF(context.Background(), "123")
 
 		assert.Error(t, err)
@@ -215,13 +217,13 @@ func TestUserService_FindByCPF(t *testing.T) {
 	})
 
 	t.Run("should return the user", func(t *testing.T) {
-		mockRepo := new(MockUserRepository)
-		mockUser := &User{}
+		mockRepo := new(mocks.MockUserRepository)
+		mockUser := &user.User{}
 		mockRepo.
 			On("FindByCPF", mock.Anything, mock.Anything).
 			Return(mockUser, nil)
 
-		service := &userSvc{userRepo: mockRepo}
+		service := user.NewUserService(mockRepo)
 		user, err := service.FindByCPF(context.Background(), "123")
 
 		assert.NoError(t, err)
@@ -233,12 +235,12 @@ func TestUserService_FindByCPF(t *testing.T) {
 
 func TestUserService_FindByCNPJ(t *testing.T) {
 	t.Run("should return error if db fails", func(t *testing.T) {
-		mockRepo := new(MockUserRepository)
+		mockRepo := new(mocks.MockUserRepository)
 		mockRepo.
 			On("FindByCNPJ", mock.Anything, mock.Anything).
 			Return(nil, errors.New("db fail"))
 
-		service := &userSvc{userRepo: mockRepo}
+		service := user.NewUserService(mockRepo)
 		user, err := service.FindByCNPJ(context.Background(), "123")
 
 		assert.Error(t, err)
@@ -249,12 +251,12 @@ func TestUserService_FindByCNPJ(t *testing.T) {
 	})
 
 	t.Run("should return not found if user is nil", func(t *testing.T) {
-		mockRepo := new(MockUserRepository)
+		mockRepo := new(mocks.MockUserRepository)
 		mockRepo.
 			On("FindByCNPJ", mock.Anything, mock.Anything).
 			Return(nil, nil)
 
-		service := &userSvc{userRepo: mockRepo}
+		service := user.NewUserService(mockRepo)
 		user, err := service.FindByCNPJ(context.Background(), "123")
 
 		assert.Error(t, err)
@@ -267,13 +269,13 @@ func TestUserService_FindByCNPJ(t *testing.T) {
 	})
 
 	t.Run("should return the user", func(t *testing.T) {
-		mockRepo := new(MockUserRepository)
-		mockUser := &User{}
+		mockRepo := new(mocks.MockUserRepository)
+		mockUser := &user.User{}
 		mockRepo.
 			On("FindByCNPJ", mock.Anything, mock.Anything).
 			Return(mockUser, nil)
 
-		service := &userSvc{userRepo: mockRepo}
+		service := user.NewUserService(mockRepo)
 		user, err := service.FindByCNPJ(context.Background(), "123")
 
 		assert.NoError(t, err)
@@ -285,12 +287,12 @@ func TestUserService_FindByCNPJ(t *testing.T) {
 
 func TestUserService_FindByEmail(t *testing.T) {
 	t.Run("should return error if db fails", func(t *testing.T) {
-		mockRepo := new(MockUserRepository)
+		mockRepo := new(mocks.MockUserRepository)
 		mockRepo.
 			On("FindByEmail", mock.Anything, mock.Anything).
 			Return(nil, errors.New("db fail"))
 
-		service := &userSvc{userRepo: mockRepo}
+		service := user.NewUserService(mockRepo)
 		user, err := service.FindByEmail(context.Background(), "john@example.com")
 
 		assert.Error(t, err)
@@ -301,12 +303,12 @@ func TestUserService_FindByEmail(t *testing.T) {
 	})
 
 	t.Run("should return not found if user is nil", func(t *testing.T) {
-		mockRepo := new(MockUserRepository)
+		mockRepo := new(mocks.MockUserRepository)
 		mockRepo.
 			On("FindByEmail", mock.Anything, mock.Anything).
 			Return(nil, nil)
 
-		service := &userSvc{userRepo: mockRepo}
+		service := user.NewUserService(mockRepo)
 		user, err := service.FindByEmail(context.Background(), "john@example.com")
 
 		assert.Error(t, err)
@@ -319,13 +321,13 @@ func TestUserService_FindByEmail(t *testing.T) {
 	})
 
 	t.Run("should return the user", func(t *testing.T) {
-		mockRepo := new(MockUserRepository)
-		mockUser := &User{}
+		mockRepo := new(mocks.MockUserRepository)
+		mockUser := &user.User{}
 		mockRepo.
 			On("FindByEmail", mock.Anything, mock.Anything).
 			Return(mockUser, nil)
 
-		service := &userSvc{userRepo: mockRepo}
+		service := user.NewUserService(mockRepo)
 		user, err := service.FindByEmail(context.Background(), "john@example.com")
 
 		assert.NoError(t, err)
@@ -337,12 +339,12 @@ func TestUserService_FindByEmail(t *testing.T) {
 
 func TestUserService_FindByID(t *testing.T) {
 	t.Run("should return error if db fails", func(t *testing.T) {
-		mockRepo := new(MockUserRepository)
+		mockRepo := new(mocks.MockUserRepository)
 		mockRepo.
 			On("FindByID", mock.Anything, mock.Anything).
 			Return(nil, errors.New("db fail"))
 
-		service := &userSvc{userRepo: mockRepo}
+		service := user.NewUserService(mockRepo)
 		user, err := service.FindByID(context.Background(), 1)
 
 		assert.Error(t, err)
@@ -353,12 +355,12 @@ func TestUserService_FindByID(t *testing.T) {
 	})
 
 	t.Run("should return not found if user is nil", func(t *testing.T) {
-		mockRepo := new(MockUserRepository)
+		mockRepo := new(mocks.MockUserRepository)
 		mockRepo.
 			On("FindByID", mock.Anything, mock.Anything).
 			Return(nil, nil)
 
-		service := &userSvc{userRepo: mockRepo}
+		service := user.NewUserService(mockRepo)
 		user, err := service.FindByID(context.Background(), 1)
 
 		assert.Error(t, err)
@@ -371,13 +373,13 @@ func TestUserService_FindByID(t *testing.T) {
 	})
 
 	t.Run("should return the user", func(t *testing.T) {
-		mockRepo := new(MockUserRepository)
-		mockUser := &User{}
+		mockRepo := new(mocks.MockUserRepository)
+		mockUser := &user.User{}
 		mockRepo.
 			On("FindByID", mock.Anything, mock.Anything).
 			Return(mockUser, nil)
 
-		service := &userSvc{userRepo: mockRepo}
+		service := user.NewUserService(mockRepo)
 		user, err := service.FindByID(context.Background(), 1)
 
 		assert.NoError(t, err)
