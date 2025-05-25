@@ -31,6 +31,7 @@ func TestWalletService_Create(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, userId, entity.UserID)
 		assert.Equal(t, balance, entity.Balance)
+		assert.True(t, entity.Active)
 
 		mockRepo.AssertExpectations(t)
 	})
