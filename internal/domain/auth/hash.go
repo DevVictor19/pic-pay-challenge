@@ -19,11 +19,6 @@ func (s *bcryptSvc) Compare(pwd, hash string) bool {
 	return err == nil
 }
 
-var bcryptSvcRef *bcryptSvc
-
 func NewBcryptService() BcryptService {
-	if bcryptSvcRef == nil {
-		bcryptSvcRef = &bcryptSvc{}
-	}
-	return bcryptSvcRef
+	return &bcryptSvc{}
 }

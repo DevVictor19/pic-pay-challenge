@@ -53,11 +53,6 @@ func (a *jwtSvc) ValidateToken(token string) (*jwt.Token, error) {
 	)
 }
 
-var jwtServiceRef *jwtSvc
-
 func NewJWTService(secret, aud, iss string) JWTService {
-	if jwtServiceRef == nil {
-		jwtServiceRef = &jwtSvc{secret, iss, aud}
-	}
-	return jwtServiceRef
+	return &jwtSvc{secret, iss, aud}
 }

@@ -54,8 +54,6 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) error {
 	})
 }
 
-var authHdlRef *AuthHandler
-
 func NewAuthHandler(authService AuthService) *AuthHandler {
 	return &AuthHandler{
 		authService,
