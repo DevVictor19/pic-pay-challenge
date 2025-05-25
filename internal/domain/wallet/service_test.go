@@ -22,12 +22,23 @@ func (m *MockWalletRepository) Save(ctx context.Context, wall Wallet) error {
 
 func TestWalletService_Create(t *testing.T) {
 	mockRepo := new(MockWalletRepository)
-	mockRepo.On("Save", mock.Anything, mock.Anything).Return(nil)
+
+	var entity Wallet
+	userId := 123
+	balance := int64(1000)
+
+	mockRepo.On("Save", mock.Anything, mock.Anything).
+		Run(func(args mock.Arguments) {
+			entity = args.Get(1).(Wallet)
+		}).
+		Return(nil).Once()
 
 	service := NewWalletService(mockRepo)
 
-	err := service.Create(context.Background(), 1, 1000)
+	err := service.Create(context.Background(), userId, balance)
 	assert.NoError(t, err)
+	assert.Equal(t, userId, entity.UserID)
+	assert.Equal(t, balance, entity.Balance)
 
 	mockRepo.AssertExpectations(t)
 }
