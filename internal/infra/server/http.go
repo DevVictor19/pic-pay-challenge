@@ -87,6 +87,17 @@ func mount() http.Handler {
 			r.Post("/signup", utils.MakeHandler(authHandler.Signup))
 			r.Post("/login", utils.MakeHandler(authHandler.Login))
 		})
+
+		// protected routes
+		r.Group(func(r chi.Router) {
+			r.Use(MakeJWTAuthMiddleware(jwtService, userService))
+
+			r.Route("/transactions", func(r chi.Router) {
+				r.Post("/", func(w http.ResponseWriter, r *http.Request) {
+					utils.WriteJSON(w, http.StatusOK, map[string]string{"message": "ok"})
+				})
+			})
+		})
 	})
 
 	return r
