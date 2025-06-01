@@ -8,7 +8,7 @@ import (
 
 	"github.com/DevVictor19/pic-pay-challenge/internal/domain/user"
 	"github.com/DevVictor19/pic-pay-challenge/internal/domain/wallet"
-	"github.com/DevVictor19/pic-pay-challenge/internal/infra/apperr"
+	"github.com/DevVictor19/pic-pay-challenge/internal/infra/apperror"
 )
 
 type AuthService interface {
@@ -25,50 +25,50 @@ type authSvc struct {
 
 func (s *authSvc) Signup(ctx context.Context, dto SignupDTO) error {
 	if dto.CNPJ == nil && dto.CPF == nil {
-		return apperr.NewHttpError(http.StatusBadRequest, "CPF or CNPJ must be passed")
+		return apperror.NewHttpError(http.StatusBadRequest, "CPF or CNPJ must be passed")
 	}
 
 	if dto.CNPJ != nil && dto.CPF != nil {
-		return apperr.NewHttpError(http.StatusBadRequest, "chose CPF or CNPJ for create a new user")
+		return apperror.NewHttpError(http.StatusBadRequest, "chose CPF or CNPJ for create a new user")
 	}
 
 	withSameEmail, err := s.userService.FindByEmail(ctx, dto.Email)
 	if err != nil {
-		var httpError *apperr.HttpError
+		var httpError *apperror.HttpError
 		if ok := errors.As(err, &httpError); !ok {
 			return err
 		}
 	}
 
 	if withSameEmail != nil {
-		return apperr.NewHttpError(http.StatusConflict, "email already in use")
+		return apperror.NewHttpError(http.StatusConflict, "email already in use")
 	}
 
 	if dto.CNPJ != nil {
 		withSameCnpj, err := s.userService.FindByCNPJ(ctx, *dto.CNPJ)
 		if err != nil {
-			var httpError *apperr.HttpError
+			var httpError *apperror.HttpError
 			if ok := errors.As(err, &httpError); !ok {
 				return err
 			}
 		}
 
 		if withSameCnpj != nil {
-			return apperr.NewHttpError(http.StatusConflict, "cnpj already in use")
+			return apperror.NewHttpError(http.StatusConflict, "cnpj already in use")
 		}
 	}
 
 	if dto.CPF != nil {
 		withSameCpf, err := s.userService.FindByCPF(ctx, *dto.CPF)
 		if err != nil {
-			var httpError *apperr.HttpError
+			var httpError *apperror.HttpError
 			if ok := errors.As(err, &httpError); !ok {
 				return err
 			}
 		}
 
 		if withSameCpf != nil {
-			return apperr.NewHttpError(http.StatusConflict, "cpf already in use")
+			return apperror.NewHttpError(http.StatusConflict, "cpf already in use")
 		}
 	}
 
@@ -116,9 +116,9 @@ func (s *authSvc) Signup(ctx context.Context, dto SignupDTO) error {
 func (s *authSvc) Login(ctx context.Context, dto LoginDTO) (string, error) {
 	user, err := s.userService.FindByEmail(ctx, dto.Email)
 	if err != nil {
-		var httpError *apperr.HttpError
+		var httpError *apperror.HttpError
 		if ok := errors.As(err, &httpError); ok {
-			return "", apperr.NewHttpError(http.StatusUnauthorized, "invalid email or password")
+			return "", apperror.NewHttpError(http.StatusUnauthorized, "invalid email or password")
 		}
 
 		return "", err
@@ -126,7 +126,7 @@ func (s *authSvc) Login(ctx context.Context, dto LoginDTO) (string, error) {
 
 	isValidPwd := s.bcryptService.Compare(dto.Password, user.Password)
 	if !isValidPwd {
-		return "", apperr.NewHttpError(http.StatusUnauthorized, "invalid email or password")
+		return "", apperror.NewHttpError(http.StatusUnauthorized, "invalid email or password")
 	}
 
 	token, err := s.jwtService.GenerateToken(user.ID, time.Minute*30)

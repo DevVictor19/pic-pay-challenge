@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/DevVictor19/pic-pay-challenge/internal/infra/apperr"
+	"github.com/DevVictor19/pic-pay-challenge/internal/infra/apperror"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -27,7 +27,7 @@ func TestUserService_CreateCommon(t *testing.T) {
 		id, err := service.CreateCommon(context.Background(), dto)
 
 		assert.Error(t, err)
-		var httpError *apperr.HttpError
+		var httpError *apperror.HttpError
 		assert.ErrorAs(t, err, &httpError)
 		assert.Equal(t, httpError.Code, http.StatusUnprocessableEntity)
 		assert.Equal(t, 0, id)
@@ -111,7 +111,7 @@ func TestUserService_CreateShopkeeper(t *testing.T) {
 		id, err := service.CreateShopkeeper(context.Background(), dto)
 
 		assert.Error(t, err)
-		var httpError *apperr.HttpError
+		var httpError *apperror.HttpError
 		assert.ErrorAs(t, err, &httpError)
 		assert.Equal(t, httpError.Code, http.StatusUnprocessableEntity)
 		assert.Equal(t, 0, id)
@@ -206,7 +206,7 @@ func TestUserService_FindByCPF(t *testing.T) {
 		user, err := service.FindByCPF(context.Background(), "123")
 
 		assert.Error(t, err)
-		var httpError *apperr.HttpError
+		var httpError *apperror.HttpError
 		assert.ErrorAs(t, err, &httpError)
 		assert.Equal(t, httpError.Code, http.StatusNotFound)
 		assert.Nil(t, user)
@@ -258,7 +258,7 @@ func TestUserService_FindByCNPJ(t *testing.T) {
 		user, err := service.FindByCNPJ(context.Background(), "123")
 
 		assert.Error(t, err)
-		var httpError *apperr.HttpError
+		var httpError *apperror.HttpError
 		assert.ErrorAs(t, err, &httpError)
 		assert.Equal(t, httpError.Code, http.StatusNotFound)
 		assert.Nil(t, user)
@@ -310,7 +310,7 @@ func TestUserService_FindByEmail(t *testing.T) {
 		user, err := service.FindByEmail(context.Background(), "john@example.com")
 
 		assert.Error(t, err)
-		var httpError *apperr.HttpError
+		var httpError *apperror.HttpError
 		assert.ErrorAs(t, err, &httpError)
 		assert.Equal(t, httpError.Code, http.StatusNotFound)
 		assert.Nil(t, user)
@@ -362,7 +362,7 @@ func TestUserService_FindByID(t *testing.T) {
 		user, err := service.FindByID(context.Background(), 1)
 
 		assert.Error(t, err)
-		var httpError *apperr.HttpError
+		var httpError *apperror.HttpError
 		assert.ErrorAs(t, err, &httpError)
 		assert.Equal(t, httpError.Code, http.StatusNotFound)
 		assert.Nil(t, user)

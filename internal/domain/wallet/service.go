@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/DevVictor19/pic-pay-challenge/internal/infra/apperr"
+	"github.com/DevVictor19/pic-pay-challenge/internal/infra/apperror"
 )
 
 type WalletService interface {
@@ -29,7 +29,7 @@ func (s *walletSvc) Create(ctx context.Context, userID int, balance int64) error
 	}
 
 	if err := wall.Validate(); err != nil {
-		return apperr.NewHttpError(http.StatusUnprocessableEntity, err.Error())
+		return apperror.NewHttpError(http.StatusUnprocessableEntity, err.Error())
 	}
 
 	if err := wallRepo.Save(ctx, wall); err != nil {

@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/DevVictor19/pic-pay-challenge/internal/infra/apperr"
+	"github.com/DevVictor19/pic-pay-challenge/internal/infra/apperror"
 )
 
 type UserService interface {
@@ -36,7 +36,7 @@ func (s *userSvc) CreateCommon(ctx context.Context, dto CommonUserDTO) (int, err
 
 	err := user.Validate()
 	if err != nil {
-		return 0, apperr.NewHttpError(http.StatusUnprocessableEntity, err.Error())
+		return 0, apperror.NewHttpError(http.StatusUnprocessableEntity, err.Error())
 	}
 
 	userId, err := s.userRepo.Save(ctx, user)
@@ -62,7 +62,7 @@ func (s *userSvc) CreateShopkeeper(ctx context.Context, dto ShopkeeperUserDTO) (
 
 	err := user.Validate()
 	if err != nil {
-		return 0, apperr.NewHttpError(http.StatusUnprocessableEntity, err.Error())
+		return 0, apperror.NewHttpError(http.StatusUnprocessableEntity, err.Error())
 	}
 
 	userId, err := s.userRepo.Save(ctx, user)
@@ -80,7 +80,7 @@ func (s *userSvc) FindByCPF(ctx context.Context, cpf string) (*User, error) {
 	}
 
 	if usr == nil {
-		return nil, apperr.NewHttpError(http.StatusNotFound, "user not found")
+		return nil, apperror.NewHttpError(http.StatusNotFound, "user not found")
 	}
 
 	return usr, nil
@@ -93,7 +93,7 @@ func (s *userSvc) FindByCNPJ(ctx context.Context, cnpj string) (*User, error) {
 	}
 
 	if usr == nil {
-		return nil, apperr.NewHttpError(http.StatusNotFound, "user not found")
+		return nil, apperror.NewHttpError(http.StatusNotFound, "user not found")
 	}
 
 	return usr, nil
@@ -106,7 +106,7 @@ func (s *userSvc) FindByEmail(ctx context.Context, email string) (*User, error) 
 	}
 
 	if usr == nil {
-		return nil, apperr.NewHttpError(http.StatusNotFound, "user not found")
+		return nil, apperror.NewHttpError(http.StatusNotFound, "user not found")
 	}
 
 	return usr, nil
@@ -119,7 +119,7 @@ func (s *userSvc) FindByID(ctx context.Context, id int) (*User, error) {
 	}
 
 	if usr == nil {
-		return nil, apperr.NewHttpError(http.StatusNotFound, "user not found")
+		return nil, apperror.NewHttpError(http.StatusNotFound, "user not found")
 	}
 
 	return usr, nil

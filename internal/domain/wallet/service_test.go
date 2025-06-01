@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/DevVictor19/pic-pay-challenge/internal/infra/apperr"
+	"github.com/DevVictor19/pic-pay-challenge/internal/infra/apperror"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -56,7 +56,7 @@ func TestWalletService_Create(t *testing.T) {
 		service := NewWalletService(mockRepo)
 
 		err := service.Create(context.Background(), 0, 1000)
-		var httpError *apperr.HttpError
+		var httpError *apperror.HttpError
 		assert.ErrorAs(t, err, &httpError)
 		assert.Equal(t, http.StatusUnprocessableEntity, httpError.Code)
 
@@ -69,7 +69,7 @@ func TestWalletService_Create(t *testing.T) {
 		service := NewWalletService(mockRepo)
 
 		err := service.Create(context.Background(), 1, -1000)
-		var httpError *apperr.HttpError
+		var httpError *apperror.HttpError
 		assert.ErrorAs(t, err, &httpError)
 		assert.Equal(t, http.StatusUnprocessableEntity, httpError.Code)
 

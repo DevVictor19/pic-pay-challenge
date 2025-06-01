@@ -1,4 +1,4 @@
-package apperr
+package apperror
 
 type HttpError struct {
 	Code    int    `json:"code"`

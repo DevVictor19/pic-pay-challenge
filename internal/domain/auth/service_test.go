@@ -8,7 +8,7 @@ import (
 
 	"github.com/DevVictor19/pic-pay-challenge/internal/domain/user"
 	"github.com/DevVictor19/pic-pay-challenge/internal/domain/wallet"
-	"github.com/DevVictor19/pic-pay-challenge/internal/infra/apperr"
+	"github.com/DevVictor19/pic-pay-challenge/internal/infra/apperror"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -46,7 +46,7 @@ func TestAuthService_Signup(t *testing.T) {
 		err := service.Signup(context.Background(), dto)
 
 		assert.Error(t, err)
-		var httpError *apperr.HttpError
+		var httpError *apperror.HttpError
 		assert.ErrorAs(t, err, &httpError)
 		assert.Equal(t, httpError.Code, http.StatusBadRequest)
 
@@ -92,7 +92,7 @@ func TestAuthService_Signup(t *testing.T) {
 		err := service.Signup(context.Background(), dto)
 
 		assert.Error(t, err)
-		var httpError *apperr.HttpError
+		var httpError *apperror.HttpError
 		assert.ErrorAs(t, err, &httpError)
 		assert.Equal(t, http.StatusBadRequest, httpError.Code)
 
@@ -180,7 +180,7 @@ func TestAuthService_Signup(t *testing.T) {
 		err := service.Signup(context.Background(), dto)
 
 		assert.Error(t, err)
-		var httpError *apperr.HttpError
+		var httpError *apperror.HttpError
 		assert.ErrorAs(t, err, &httpError)
 		assert.Equal(t, http.StatusConflict, httpError.Code)
 
@@ -270,7 +270,7 @@ func TestAuthService_Signup(t *testing.T) {
 		err := service.Signup(context.Background(), dto)
 
 		assert.Error(t, err)
-		var httpError *apperr.HttpError
+		var httpError *apperror.HttpError
 		assert.ErrorAs(t, err, &httpError)
 		assert.Equal(t, http.StatusConflict, httpError.Code)
 
@@ -360,7 +360,7 @@ func TestAuthService_Signup(t *testing.T) {
 		err := service.Signup(context.Background(), dto)
 
 		assert.Error(t, err)
-		var httpError *apperr.HttpError
+		var httpError *apperror.HttpError
 		assert.ErrorAs(t, err, &httpError)
 		assert.Equal(t, http.StatusConflict, httpError.Code)
 
@@ -485,7 +485,7 @@ func TestAuthService_Login(t *testing.T) {
 		}
 
 		userServiceMock.On("FindByEmail", mock.Anything, dto.Email).
-			Return(nil, apperr.NewHttpError(http.StatusNotFound, "user not found"))
+			Return(nil, apperror.NewHttpError(http.StatusNotFound, "user not found"))
 
 		service := NewAuthService(userServiceMock, nil, bcryptServiceMock, jwtServiceMock)
 
